@@ -38,6 +38,7 @@ function ajax(url, method, data, target) {
       console.log(template.content.children)
 
       // @ts-ignore - all the targets are going to be Elements
+      // TODO Support for retargeting
       targetElement.replaceWith(template.content)
     } else {
       // TODO check for html wrapper?
