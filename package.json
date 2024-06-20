@@ -1,0 +1,12 @@
+{
+  "name": "missing-piece",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "serve .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "serve": "^14.2.3"
+  }
+}
