@@ -12,6 +12,11 @@ app.get('/missing-piece.js', (req, res) => {
   res.send(MISSING_PIECE)
 })
 
+app.all('/redirect/303', (req, res) => {
+  res.setHeader('location', '/responses/text.html')
+  res.sendStatus(303)
+})
+
 app.use(express.static('test'))
 
 console.log(`Serving test site on http://localhost:${PORT}`)

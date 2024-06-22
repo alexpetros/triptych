@@ -1,6 +1,5 @@
 const ADDITIONAL_FORM_METHODS = ['PUT', 'PATCH', 'DELETE']
 const EXISTING_TARGET_KEYWORDS = ['_self', '_blank', '_parent', '_top', '_unfencedTop']
-const REDIRECT_STATUS_CODES = [301, 302, 303, 307, 308]
 
 /**
   * @param {string} url
@@ -25,20 +24,12 @@ function ajax(url, method, data, target) {
       }
     }
 
-    const opts = { method, redirect: 'manual' }
+    const opts = { method }
     if (method !== 'GET' && method !== 'DELETE') {
       opts.body = data
     } // else convert to URL params
 
-    // @ts-ignore
     const res = await fetch(url, opts)
-    if (REDIRECT_STATUS_CODES.includes(res.status)) {
-      // TODO for 302 change POST to GET
-      // for 303 change to GET
-      // otherwise don't change
-      const location = res.headers.get('location')
-    }
-
     const responseText = await res.text()
     if (targetElement) {
       const template = document.createElement('template')
