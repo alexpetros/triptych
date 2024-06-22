@@ -1,12 +1,13 @@
 {
   "name": "missing-piece",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "main": "missing-piece.js",
   "scripts": {
-    "start": "serve .",
+    "start": "node test.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "serve": "^14.2.3"
+    "express": "^4.19.2"
   }
 }

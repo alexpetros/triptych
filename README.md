@@ -21,6 +21,21 @@ use namespaced custom attributes, but instead uses existing (or plausible) HTML 
 in a backwards compatible manner. Much of the script's complexity results from the need to not break
 existing uses of attributes like `target` or `method`.
 
+## Limitations
+
+Because these features are meant to be incorporated into the standard, they simulate the desired browser behavior, up to the limit of JavaScript's ability.
+
+The most significant of these limitations is on forms. When submitting a POST form, the default
+behavior is to push that URL onto the URL bar and displays the resulting HTML from the form;
+clicking the refresh button resubmits the POST request—after the user confirms that they intended
+this. Missing Piece simulates that behavior for PUT requests by replacing the entire document with
+the result of the PUT request and pushing the new URL, but it cannot make the refresh button
+resumbit that PUT request—a refresh will just issue a GET request.
+
+Ideally, for all of these requests, the browser should show a loading bar, the same way that
+clicking on a link does. This behavior is impossible to simulate in JavaScript but would
+significantly benefit the user if incorporated into the browser.
+
 ## FAQ
 
 ### Should I use this in my project?
