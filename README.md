@@ -53,6 +53,11 @@ The entire source is in `./triptych.js`.
 To run the tests, first install the dev dependencies with `npm install`.
 Then, run the tests by opening `./test/index.html` in your browser.
 
+### To-do
+
+* Add full-page tests that verify existing GET/POST forms are not affected
+* Push new methods to history
+
 ## FAQ
 
 ### Should I use this in my project?
