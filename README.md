@@ -82,6 +82,8 @@ The entire source is in `./triptych.js`.
 To run the tests, first install the dev dependencies with `npm install`.
 Then, run the tests by opening `./test/index.html` in your browser.
 
+You can also play around with manual tests by running `npm run manual-test`
+
 ### To-do
 
 * Add full-page tests that verify existing GET/POST forms are not affected
