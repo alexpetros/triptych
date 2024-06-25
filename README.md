@@ -8,8 +8,9 @@ These three, small additions to HTML dramatically expand its expressive power, a
 compelling for a variety of interactive web applications.
 
 I outline the rationale for these proposals in [this talk I gave at Big Sky Dev Con
-2024](https://unplannedobsolescence.com/blog/life-and-death-of-htmx/). The standards proposals for
-each of these issues is forthcoming.
+2024](https://unplannedobsolescence.com/blog/life-and-death-of-htmx/).
+The standards proposals for each of these issues is forthcoming - if you're interested in working on
+that reach out to me!
 
 ## Installation
 
@@ -24,7 +25,7 @@ Include triptych as a script in your HTML:
 This project aims to demonstrate the efficacy of the above three HTML enhancements, to advocate for
 their addition to the HTML standard, and to provide that functionality until then.
 
-Because the ultimate goal of Missing Piece is to be incorporated into the HTML standard, it does not
+Because the ultimate goal of Triptych is to be incorporated into the HTML standard, it does not
 use namespaced custom attributes, but instead uses existing (or plausible) HTML standard attributes
 in a backwards compatible manner. Much of the script's complexity results from the need to not break
 existing uses of attributes like `target` or `method`.
@@ -37,7 +38,7 @@ browser behavior, up to the limit of JavaScript's ability.
 The most significant of these limitations is on forms. When submitting a POST form, the default
 behavior is to push that URL onto the URL bar and displays the resulting HTML from the form;
 clicking the refresh button resubmits the POST request—after the user confirms that they intended
-this. Missing Piece simulates that behavior for PUT requests by replacing the entire document with
+this. Triptych simulates that behavior for PUT requests by replacing the entire document with
 the result of the PUT request and pushing the new URL, but it cannot make the refresh button
 resumbit that PUT request—a refresh will just issue a GET request.
 
