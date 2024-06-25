@@ -1,25 +1,22 @@
 # Triptych - Polyfill for three small HTML proposals
 
-Give buttons and forms access to additional HTTP methods, and let buttons, forms, and links target
-parts of the page for partial replacement.
-
-Replace <main> with the result of GET /home:
+Replace `<main>` with the result of `GET /home:`
 ```html
 <a href=/home target="main">Home</a>
 <main></main>
 ```
 
-Replace the whole page with the result of DELETE /users/354
+Replace the whole page with the result of `DELETE /users/354`:
 ```html
 <button action=/users/354 method=DELETE></button>
 ```
 
-Replace the button with the result of DELETE /users/354
+Replace the button with the result of `DELETE /users/354`
 ```html
 <button action=/users/354 method=DELETE target="_this"></button>
 ```
 
-Replace the #user-info div with the result of PUT/users/354
+Replace the #user-info `<div>` with the result of `PUT /users/354`
 ```html
 <div id=user-info></div>
 <form action="/users/354" method=PUT target="#user-info">
