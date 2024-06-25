@@ -20,7 +20,7 @@
 
 <script src="../node_modules/mocha/mocha.js"></script>
 <script src="../node_modules/fetch-mock/es5/client-bundle.js"></script>
-<script src="../missing-piece.js"></script>
+<script src="../triptych.js"></script>
 
 <script class="mocha-init">
   mocha.setup('bdd');
@@ -28,13 +28,9 @@
 </script>
 
 <script src="util.js"></script>
-
-<!-- core tests -->
-
 <script src="core-tests.js"></script>
 
 <div id="mocha"></div>
-
 <script class="mocha-exec">
     document.addEventListener("DOMContentLoaded", function () {
         mocha.setup({globals: ['$0', '$1', '$2', '$3', '$4', 'performance', 'requestAnimationFrame', 'cancelAnimationFrame', 'confirm']}); <!-- IE11 -->

@@ -17,6 +17,9 @@ function ajax(url, method, data, target) {
     if (target === '_this') {
       targetElement = e.target
     } else if (target) {
+      // Existing iFrames take precendence
+      if (document.querySelector(`iframe[name="${target}"]`)) return null
+
       targetElement = document.querySelector(target)
       if (!targetElement) {
         console.error(`no element found for target ${target} - ignorning`)
@@ -79,11 +82,9 @@ function processNode(node) {
   const links = node.querySelectorAll('a[target]')
   for (const link of links) {
     const target = link.getAttribute('target')
-    const hasExistingBehavior = EXISTING_TARGET_KEYWORDS.includes(target) ||
-      document.querySelector(`iframe[name=${target}]`)
 
     const url = link.getAttribute('href')
-    if (!hasExistingBehavior) {
+    if (!EXISTING_TARGET_KEYWORDS.includes(target) ) {
       link.addEventListener('click', ajax(url, 'GET', undefined, target))
     }
   }

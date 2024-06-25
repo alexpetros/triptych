@@ -32,6 +32,21 @@ describe("Targeting", async () => {
     assertEqual(response.innerHTML, 'success')
   })
 
+  it('will target an iFrame if that iFrame exists', async () => {
+    fetchMock.get('/test', '<div id=response>success</div>')
+    make(`
+      <button id=button action="/test" target="#response-target">Plain Text</button>
+      <iframe name="#response-target" id=iframe></iframe>
+      <div id=response-target>Target</div>
+    `)
+    let button = byId('button')
+    button.click()
+    await fetchMock.flush(true)
+
+    assertTruthy(byId('button'))
+    assertTruthy(byId('iframe'))
+    assertTruthy(byId('response-target'))
+  })
 })
 
 describe("<button>", async () => {
