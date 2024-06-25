@@ -17,7 +17,7 @@ function ajax(url, method, data, target) {
     if (target === '_this') {
       targetElement = e.target
     } else if (target) {
-      targetElement = document.querySelector('target')
+      targetElement = document.querySelector(target)
       if (!targetElement) {
         console.error(`no element found for target ${target} - ignorning`)
         return null
@@ -35,7 +35,6 @@ function ajax(url, method, data, target) {
       const template = document.createElement('template')
       template.innerHTML = responseText
       processNode(template)
-      console.log(template.content.children)
 
       // @ts-ignore - all the targets are going to be Elements
       targetElement.replaceWith(template.content)

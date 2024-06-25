@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Missing Piece Tests</title>
+<script src="./missing-piece.js"></script>
+
+<h1>Missing Piece Tests</h1>
+
+<h2>Parsing</h2>
+
+<button action="/responses/text.html" method=GET target="_this">Plain Text</button>
+<button action="/responses/h3.html" method=GET target="_this">H3</button>
+<button action="/responses/red-h3.html" method=GET target="_this">Red H3</button>
+<button action="/responses/all-blue.html" method=GET target="_this">color: blue</button>
+
+<h2>Forms</h2>
+
+<form action="/responses/text" method=GET>
+  <input type=hidden name=key value=tst>
+  <button>Get</button>
+</form>
+
+<form action="/responses/text" method=GET target="_this">
+  <input type=hidden name=key value=tst>
+  <button>Get (self target)</button>
+</form>
+
+<form action="/responses/text" method=PUT>
+  <input type=hidden name=key value=tst>
+  <button>Put</button>
+</form>
+
+<form action="/responses/text" method=DELETE>
+  <input type=hidden name=key value=tst>
+  <button>Delete</button>
+</form>
+
+
+<h2>Buttons</h2>
+<button action="/responses/text.html">Get (default)</button>
+<button action="/responses/text.html" method=GET>Get</button>
+<button action="/responses/text.html" method=POST>Post</button>
+<button action="/responses/text.html" method=PUT>Put</button>
+<button action="/responses/text.html" method=DELETE>Delete</button>
+<button action="/redirect/303" method=PUT>Redirect success</button>
+

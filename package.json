@@ -8,6 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "fetch-mock": "^9.11.0",
+    "mocha": "^9.2.2",
+    "mocha-chrome": "^2.2.0"
   }
 }
