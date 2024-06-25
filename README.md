@@ -1,11 +1,35 @@
-# Triptych - Three HTML small proposals
+# Triptych - Polyfill for three small HTML proposals
+
+Give buttons and forms access to additional HTTP methods, and let buttons, forms, and links target
+parts of the page for partial replacement.
+
+```html
+<!-- Replaces <main> with the result of GET /home -->
+<a href=/home target="main">Home</a>
+<main></main>
+
+<!-- Replaces the whole page with the result of DELETE /users/354 -->
+<button action=/users/354 method=DELETE></button>
+
+<!-- Replaces itself with the result of DELETE /users/354 -->
+<button action=/users/354 method=DELETE target="_this"></button>
+
+<!-- Replaces the #user-info div with the result of PUT/users/354-->
+<div id=user-info></div>
+<form action="/users/354" method=PUT target="#user-info">
+  <input type=text name=name>
+  <input type=text name=bio>
+  <button>Submit</button>
+</form>
+```
+
+## Background
+These three, small additions to HTML dramatically expand its expressive power, and make plain HTML
+compelling for a variety of interactive web applications:
 
 - Enable buttons to make HTTP requests without wrapping them in forms
 - Enable forms and buttons to make PUT, PATCH, and DELETE requests
 - Enable links, forms, and buttons to target a part of the DOM for replacement
-
-These three, small additions to HTML dramatically expand its expressive power, and make plain HTML
-compelling for a variety of interactive web applications.
 
 I outline the rationale for these proposals in [this talk I gave at Big Sky Dev Con
 2024](https://unplannedobsolescence.com/blog/life-and-death-of-htmx/).
