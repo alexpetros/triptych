@@ -3,18 +3,24 @@
 Give buttons and forms access to additional HTTP methods, and let buttons, forms, and links target
 parts of the page for partial replacement.
 
+Replace <main> with the result of GET /home:
 ```html
-<!-- Replaces <main> with the result of GET /home -->
 <a href=/home target="main">Home</a>
 <main></main>
+```
 
-<!-- Replaces the whole page with the result of DELETE /users/354 -->
+Replace the whole page with the result of DELETE /users/354
+```html
 <button action=/users/354 method=DELETE></button>
+```
 
-<!-- Replaces itself with the result of DELETE /users/354 -->
+Replace the button with the result of DELETE /users/354
+```html
 <button action=/users/354 method=DELETE target="_this"></button>
+```
 
-<!-- Replaces the #user-info div with the result of PUT/users/354-->
+Replace the #user-info div with the result of PUT/users/354
+```html
 <div id=user-info></div>
 <form action="/users/354" method=PUT target="#user-info">
   <input type=text name=name>
