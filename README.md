@@ -1,15 +1,23 @@
-# Missing Piece - Tiny HTML Additions for Massive Impact
+# Triptych - Three HTML small proposals
 
 - Enable buttons to make HTTP requests without wrapping them in forms
 - Enable forms and buttons to make PUT, PATCH, and DELETE requests
 - Enable links, forms, and buttons to target a part of the DOM for replacement
 
-These three, small additions to HTML dramatically expand its expressive power, and make it
-sufficient for a variety of interactive web applications.
+These three, small additions to HTML dramatically expand its expressive power, and make plain HTML
+compelling for a variety of interactive web applications.
 
 I outline the rationale for these proposals in [this talk I gave at Big Sky Dev Con
 2024](https://unplannedobsolescence.com/blog/life-and-death-of-htmx/). The standards proposals for
 each of these issues is forthcoming.
+
+## Installation
+
+Include triptych as a script in your HTML:
+
+```html
+<script src="triptych.js"></script>
+```
 
 ## Design Goals
 
@@ -23,7 +31,8 @@ existing uses of attributes like `target` or `method`.
 
 ## Limitations
 
-Because these features are meant to be incorporated into the standard, they simulate the desired browser behavior, up to the limit of JavaScript's ability.
+Because these features are meant to be incorporated into the standard, they simulate the desired
+browser behavior, up to the limit of JavaScript's ability.
 
 The most significant of these limitations is on forms. When submitting a POST form, the default
 behavior is to push that URL onto the URL bar and displays the resulting HTML from the form;
@@ -35,6 +44,13 @@ resumbit that PUT request—a refresh will just issue a GET request.
 Ideally, for all of these requests, the browser should show a loading bar, the same way that
 clicking on a link does. This behavior is impossible to simulate in JavaScript but would
 significantly benefit the user if incorporated into the browser.
+
+## Development
+
+The entire source is in `./triptych.js`.
+
+To run the tests, first install the dev dependencies with `npm install`.
+Then, run the tests by opening `./test/index.html` in your browser.
 
 ## FAQ
 

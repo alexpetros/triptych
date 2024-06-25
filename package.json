@@ -1,8 +1,9 @@
 {
-  "name": "missing-piece",
+  "name": "triptych",
   "description": "",
   "type": "module",
-  "main": "missing-piece.js",
+  "main": "triptych.js",
+  "version": "0.1",
   "scripts": {
     "start": "node test.js",
     "test": "echo \"Error: no test specified\" && exit 1"
