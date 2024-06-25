@@ -1,6 +1,12 @@
 const ADDITIONAL_FORM_METHODS = ['PUT', 'PATCH', 'DELETE']
 const EXISTING_TARGET_KEYWORDS = ['_self', '_blank', '_parent', '_top', '_unfencedTop']
 
+function replacePage(html, url) {
+  processNode(document)
+  document.querySelector('html').innerHTML = html
+  history.pushState({ html }, "", url)
+}
+
 /**
   * @param {string} url
   * @param {string} method
@@ -30,7 +36,7 @@ function ajax(url, method, data, target) {
     const opts = { method }
     if (method !== 'GET' && method !== 'DELETE') {
       opts.body = data
-    } // else convert to URL params
+    } // TODO add GET + DELETE url params
 
     const res = await fetch(url, opts)
     const responseText = await res.text()
@@ -42,10 +48,10 @@ function ajax(url, method, data, target) {
       // @ts-ignore - all the targets are going to be Elements
       targetElement.replaceWith(template.content)
     } else {
-      // TODO check for html wrapper?
-      document.querySelector('html').innerHTML = responseText
-      processNode(document)
-      // TODO push to url and history
+      if (!history.state) {
+        history.replaceState({ html: document.documentElement.innerHTML }, "")
+      }
+      replacePage(responseText, res.url)
     }
   }
 }
@@ -95,3 +101,11 @@ if (document.readyState === "loading") {
 } else {
   processNode(document)
 }
+
+// Handle forward/back buttons
+window.addEventListener("popstate", (event) => {
+  if (event.state) {
+    document.querySelector('html').innerHTML = event.state.html
+  }
+})
+

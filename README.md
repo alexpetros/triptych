@@ -39,6 +39,8 @@ I outline the rationale for these proposals in [this talk I gave at Big Sky Dev 
 The standards proposals for each of these issues is forthcoming - if you're interested in working on
 that reach out to me!
 
+Inspired by [htmx](https://htmx.org/), [htmz](https://leanrada.com/htmz/), and others hypermedia libraries.
+
 ## Installation
 
 Include triptych as a script in your HTML:
