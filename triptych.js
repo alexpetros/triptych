@@ -1,10 +1,29 @@
-const ADDITIONAL_FORM_METHODS = ['PUT', 'PATCH', 'DELETE']
-const EXISTING_TARGET_KEYWORDS = ['_self', '_blank', '_parent', '_top', '_unfencedTop']
+// These are vars so that they just get redeclared if the script is re-executed
+var ADDITIONAL_FORM_METHODS = ['PUT', 'PATCH', 'DELETE']
+var EXISTING_TARGET_KEYWORDS = ['_self', '_blank', '_parent', '_top', '_unfencedTop']
 
-function replacePage(html, url) {
-  processNode(document)
+function replacePage(html, url, isPop) {
+  if (!history.state) {
+    const state = { html: document.documentElement.innerHTML, url: window.location.href }
+    history.replaceState(state, "")
+  }
+
   document.querySelector('html').innerHTML = html
-  history.pushState({ html }, "", url)
+  // If we didn't just pop the state (i.e. "go back"), then push the new state to history
+  if (!isPop) history.pushState({ html, url }, "", url)
+
+
+  // We have to manually execute all the scripts that we inserted into the page
+  document.querySelectorAll('script').forEach(oldScript => {
+    const newScript = document.createElement("script");
+    Array.from(oldScript.attributes).forEach( attr => {
+      newScript.setAttribute(attr.name, attr.value)
+    });
+
+    const scriptText = document.createTextNode(oldScript.innerHTML);
+    newScript.appendChild(scriptText);
+    oldScript.replaceWith(newScript)
+  })
 }
 
 /**
@@ -48,9 +67,6 @@ function ajax(url, method, data, target) {
       // @ts-ignore - all the targets are going to be Elements
       targetElement.replaceWith(template.content)
     } else {
-      if (!history.state) {
-        history.replaceState({ html: document.documentElement.innerHTML }, "")
-      }
       replacePage(responseText, res.url)
     }
   }
@@ -104,8 +120,6 @@ if (document.readyState === "loading") {
 
 // Handle forward/back buttons
 window.addEventListener("popstate", (event) => {
-  if (event.state) {
-    document.querySelector('html').innerHTML = event.state.html
-  }
-})
+  if (event.state) replacePage(event.state.html, event.state.url, true)
+}, { once: true })
 

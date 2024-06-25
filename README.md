@@ -82,7 +82,7 @@ The entire source is in `./triptych.js`.
 To run the tests, first install the dev dependencies with `npm install`.
 Then, run the tests by opening `./test/index.html` in your browser.
 
-You can also play around with manual tests by running `npm run manual-test`
+You can also play around with manual tests by running `npm run dev`
 
 ### To-do
 
