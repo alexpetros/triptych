@@ -2,7 +2,12 @@
 var ADDITIONAL_FORM_METHODS = ['PUT', 'PATCH', 'DELETE']
 var EXISTING_TARGET_KEYWORDS = ['_self', '_blank', '_parent', '_top', '_unfencedTop']
 
-function replacePage(html, url, isPop) {
+/**
+  * @param {string} html
+  * @param {string} url
+  * @param {boolean} addHistory
+  */
+function replacePage(html, url, addHistory) {
   if (!history.state) {
     const state = { html: document.documentElement.innerHTML, url: window.location.href }
     history.replaceState(state, "")
@@ -10,18 +15,18 @@ function replacePage(html, url, isPop) {
 
   document.querySelector('html').innerHTML = html
   // If we didn't just pop the state (i.e. "go back"), then push the new state to history
-  if (!isPop) history.pushState({ html, url }, "", url)
+  if (addHistory) history.pushState({ html, url }, "", url)
 
 
   // We have to manually execute all the scripts that we inserted into the page
   document.querySelectorAll('script').forEach(oldScript => {
-    const newScript = document.createElement("script");
-    Array.from(oldScript.attributes).forEach( attr => {
+    const newScript = document.createElement("script")
+    Array.from(oldScript.attributes).forEach(attr => {
       newScript.setAttribute(attr.name, attr.value)
-    });
+    })
 
-    const scriptText = document.createTextNode(oldScript.innerHTML);
-    newScript.appendChild(scriptText);
+    const scriptText = document.createTextNode(oldScript.innerHTML)
+    newScript.appendChild(scriptText)
     oldScript.replaceWith(newScript)
   })
 }
@@ -35,21 +40,23 @@ function replacePage(html, url, isPop) {
 function ajax(url, method, data, target) {
   /** @param {Event} e */
   return async (e) => {
-    e.preventDefault()  // The new actions override old ones
+    if (target && target !== '_this') {
+      if (document.querySelector(`iframe[name="${target}"]`)) return null
+    }
 
+    // This comes after the iFrame check so that normal iFrame targeting is preserved
+    e.preventDefault()
 
     let targetElement
     if (target === '_this') {
       targetElement = e.target
-    } else if (target) {
-      // Existing iFrames take precendence
-      if (document.querySelector(`iframe[name="${target}"]`)) return null
-
+    } else {
       targetElement = document.querySelector(target)
-      if (!targetElement) {
-        console.error(`no element found for target ${target} - ignorning`)
-        return null
-      }
+    }
+
+    if (!targetElement) {
+      console.error(`no element found for target ${target} - ignorning`)
+      return null
     }
 
     const opts = { method }
@@ -112,8 +119,9 @@ function processNode(node) {
   }
 }
 
+// Process all the nodes once when the DOM is ready
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => { processNode(document) });
+  document.addEventListener("DOMContentLoaded", () => { processNode(document) })
 } else {
   processNode(document)
 }

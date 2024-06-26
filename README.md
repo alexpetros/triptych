@@ -39,7 +39,7 @@ I outline the rationale for these proposals in [this talk I gave at Big Sky Dev 
 The standards proposals for each of these issues is forthcoming - if you're interested in working on
 that reach out to me!
 
-Inspired by [htmx](https://htmx.org/), [htmz](https://leanrada.com/htmz/), and others hypermedia libraries.
+Inspired by [htmx](https://htmx.org/), [htmz](https://leanrada.com/htmz/), and the entire ecosystem of attribute-based hypermedia libraries.
 
 ## Installation
 
@@ -64,14 +64,21 @@ existing uses of attributes like `target` or `method`.
 Because these features are meant to be incorporated into the standard, they simulate the desired
 browser behavior, up to the limit of JavaScript's ability.
 
-The most significant of these limitations is on forms. When submitting a POST form, the default
+The main limitation involves full page navigations. When submitting a POST form, the default
 behavior is to push that URL onto the URL bar and displays the resulting HTML from the form;
 clicking the refresh button resubmits the POST request—after the user confirms that they intended
-this. Triptych simulates that behavior for PUT requests by replacing the entire document with
-the result of the PUT request and pushing the new URL, but it cannot make the refresh button
-resumbit that PUT request—a refresh will just issue a GET request.
+this.
 
-Ideally, for all of these requests, the browser should show a loading bar, the same way that
+When "target"s are not supplied on buttons and forms, Triptych simulates the full-page behavior to
+the best of its ability. It replaces the entire document and uses the
+[history API](https://developer.mozilla.org/en-US/docs/Web/API/History) to update the browser URL
+and history. Clicking "back" should basically work as expected.
+
+However, because of (very reasonable) limitations in JavaScript, Triptych cannot alter the behavior
+of the refresh button to make it resubmit a PUT, as proposed. Nor can it simulate one of the primary
+benefit of doing a POST-redirect pattern—that it resets the current JS environment.
+
+Also, for all of these requests, the browser should show a loading bar, the same way that
 clicking on a link does. This behavior is impossible to simulate in JavaScript but would
 significantly benefit the user if incorporated into the browser.
 
@@ -93,13 +100,15 @@ You can also play around with manual tests by running `npm run dev`
 
 ### Should I use this in my project?
 
+Not yet, but soon.
+
 This library's featureset will track the proposals that it is supporting, which will have to
-incporate feedback, and thus cannot provide strong backwards compatibility guarantees, at the start.
+incporate feedback, and thus cannot provide strong backwards compatibility guarantees at the start.
 
 That having been said, it is versioned as a pre-1.x, so feel free to make use of it as an early
 adopter if you like, and as the proposal firms up, I will make the necessary changes and log them
-appropriately.
+appropriately. It's not deployed to a CDN yet, but will be soon.
 
-### Is it deployed to a CDN?
+### What if multiple elements match the target?
 
-Not yet, but soon.
+Targeting is done using the [querySelector API](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), which performs a depth-first pre-order traversal of the document's nodes. The target will be the first matching element found, per that algorithm.

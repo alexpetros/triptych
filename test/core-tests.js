@@ -32,7 +32,7 @@ describe("Targeting", async () => {
     assertEqual(response.innerHTML, 'success')
   })
 
-  it('will target an iFrame if that iFrame exists', async () => {
+  it('will not replace an item if an iFrame with the same name exists', async () => {
     fetchMock.get('/test', '<div id=response>success</div>')
     make(`
       <button id=button action="/test" target="#response-target">Plain Text</button>
@@ -47,6 +47,7 @@ describe("Targeting", async () => {
     assertTruthy(byId('iframe'))
     assertTruthy(byId('response-target'))
   })
+
 })
 
 describe("<button>", async () => {
