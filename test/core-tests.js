@@ -93,6 +93,19 @@ describe("<button>", async () => {
     assertEqual(button2, null)
   })
 
+  it('makes a GET request with a single value, stripping existing query params', async () => {
+    fetchMock.get('/test?q=yes', 'plaintext')
+    const button = make(`
+      <button id=test action="/test?other=no" method=GET target="_this" name=q value=yes>
+        Plain Text
+      </button>
+    `)
+    button.click()
+    await fetchMock.flush(true)
+    const button2 = document.getElementById('test')
+    assertEqual(button2, null)
+  })
+
   it('makes a POST request', async () => {
     fetchMock.post('/test', 'plaintext')
     const button = make(`

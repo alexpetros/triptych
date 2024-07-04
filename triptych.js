@@ -32,14 +32,15 @@ function replacePage(html, url, addHistory) {
 }
 
 /**
-  * @param {string} url
+  * @param {string} rawUrl
   * @param {string} method
   * @param {FormData} formData
   * @param {string} target
   */
-function ajax(url, method, formData, target) {
+function ajax(rawUrl, method, formData, target) {
   // Get the full URL, resolving relatives against the document base, and removes the query string
-  // let url = new Request(rawUrl).url
+  const queryIndex = rawUrl.indexOf('?')
+  let url = queryIndex > -1 ? rawUrl.substring(0, queryIndex) : rawUrl
 
   /** @param {Event} e */
   return async (e) => {
