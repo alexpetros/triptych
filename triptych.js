@@ -34,10 +34,13 @@ function replacePage(html, url, addHistory) {
 /**
   * @param {string} url
   * @param {string} method
-  * @param {FormData} data
+  * @param {FormData} formData
   * @param {string} target
   */
-function ajax(url, method, data, target) {
+function ajax(url, method, formData, target) {
+  // Get the full URL, resolving relatives against the document base, and removes the query string
+  // let url = new Request(rawUrl).url
+
   /** @param {Event} e */
   return async (e) => {
     if (target && target !== '_this') {
@@ -60,9 +63,13 @@ function ajax(url, method, data, target) {
     }
 
     const opts = { method }
+    // Add the form's body to the
     if (method !== 'GET' && method !== 'DELETE') {
-      opts.body = data
-    } // TODO add GET + DELETE url params
+      opts.body = formData
+    } else if (formData != null) { // != null checks for both null and undefined
+      const queryParams = (new URLSearchParams(formData)).toString()
+      url += '?' + queryParams
+    }
 
     const res = await fetch(url, opts)
     const responseText = await res.text()
@@ -92,8 +99,8 @@ function processNode(node) {
     // TODO move this into query selector?
     if (target || ADDITIONAL_FORM_METHODS.includes(method)) {
       const url = form.getAttribute('action')
-      const data = new FormData(form)
-      form.addEventListener('submit', ajax(url, method, data, target))
+      const formData = new FormData(form)
+      form.addEventListener('submit', ajax(url, method, formData, target))
     }
   }
 
@@ -103,8 +110,12 @@ function processNode(node) {
     const url = button.getAttribute('action')
     const target = button.getAttribute('target')
     const method = button.getAttribute('method') || 'GET'
-    // TODO add the name/value if appropriate
-    button.addEventListener('click', ajax(url, method, undefined, target))
+    let formData
+    if (button.getAttribute('name')) {
+      formData = new FormData()
+      formData.append(button.getAttribute('name'), button.getAttribute('value'))
+    }
+    button.addEventListener('click', ajax(url, method, formData, target))
   }
 
   // #3 Links, buttons and forms can target

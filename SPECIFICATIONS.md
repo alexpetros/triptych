@@ -13,7 +13,6 @@ polyfill, so that the proposals can be built out with the necessary specificity.
 - [Unimplemented] Buttons with a name and value will send that data, in the URL if GET/DELETE, the
   body otherwise
 
-### Unresolved
 
 ## Hyperlinks
 - Anchors with the `target` attribute will replace the
@@ -24,3 +23,6 @@ polyfill, so that the proposals can be built out with the necessary specificity.
 ## Misc
 - If the target element is an invalid query selector, or does not appear
 - Add additional "_this" keyword which targets the element that made the request
+- Query strings are dropped ([4.10.22.3](https://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#form-submission-algorithm))
+
+## Unresolved

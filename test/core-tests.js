@@ -80,6 +80,19 @@ describe("<button>", async () => {
     assertEqual(button2, null)
   })
 
+  it('makes a GET request with a single value', async () => {
+    fetchMock.get('/test?q=yes', 'plaintext')
+    const button = make(`
+      <button id=test action="/test" method=GET target="_this" name=q value=yes>
+        Plain Text
+      </button>
+    `)
+    button.click()
+    await fetchMock.flush(true)
+    const button2 = document.getElementById('test')
+    assertEqual(button2, null)
+  })
+
   it('makes a POST request', async () => {
     fetchMock.post('/test', 'plaintext')
     const button = make(`
@@ -209,7 +222,7 @@ describe("<form>", async () => {
 
   it('issues DELETE requests', async () => {
     fetchMock.delete((url, options) => {
-      assertEqual(url, '/test')
+      assertEqual(url, '/test?i1=test')
       assertNull(options.body)
       return true
     }, '<div id=response>success</div>')
