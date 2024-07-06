@@ -116,11 +116,10 @@ function processNode(node) {
     button.addEventListener('click', ajax(url, method, formData, target))
   }
 
-  // #3 Links, buttons and forms can target
+  // Find the links with a target attribute
   const links = node.querySelectorAll('a[target]')
   for (const link of links) {
     const target = link.getAttribute('target')
-
     const url = link.getAttribute('href')
     if (url && !EXISTING_TARGET_KEYWORDS.includes(target) ) {
       link.addEventListener('click', ajax(url, 'GET', undefined, target))
