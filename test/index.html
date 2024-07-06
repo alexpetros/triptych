@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <title>Mocha Tests</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../node_modules/mocha/mocha.css">
-</head>
-<body style="padding:20px;font-family: sans-serif">
+<meta charset="utf-8">
+<title>Triptych Tests</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../node_modules/mocha/mocha.css">
+
+<style>
+body {
+  padding: 20px;
+  font-family: sans-serif;
+}
+</style>
 
 <h1 style="margin-top: 40px">Missing Piece test suite</h1>
 
 <h2>Mocha Test Suite</h2>
-<a href="index.html">[ALL]</a>
+<a href="./index.html">[ALL]</a>
 
 <script src="../node_modules/mocha/mocha.js"></script>
 <script src="../node_modules/fetch-mock/es5/client-bundle.js"></script>
@@ -23,21 +27,19 @@
 </script>
 
 <script src="util.js"></script>
-<script src="core.js"></script>
+<script src="links.js"></script>
 <script src="buttons.js"></script>
 <script src="forms.js"></script>
-<script src="links.js"></script>
+<script src="core.js"></script>
 
 <div id="mocha"></div>
 <script class="mocha-exec">
-    document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
         mocha.setup({globals: ['$0', '$1', '$2', '$3', '$4', 'performance', 'requestAnimationFrame', 'cancelAnimationFrame', 'confirm']}); <!-- IE11 -->
         mocha.run();
     })
 </script>
+
 <em>Work Area</em>
-<hr/>
-<div id="work-area">
-</div>
-</body>
-</html>
+<hr>
+<div id="work-area"></div>

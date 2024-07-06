@@ -38,16 +38,14 @@ function replacePage(html, url, addHistory) {
   * @param {string} target
   */
 function ajax(rawUrl, method, formData, target) {
-  // Get the full URL, resolving relatives against the document base, and removes the query string
+  // Remove the query string form the URL, if it's present
   const queryIndex = rawUrl.indexOf('?')
   let url = queryIndex > -1 ? rawUrl.substring(0, queryIndex) : rawUrl
 
   /** @param {Event} e */
   return async (e) => {
-    if (target && target !== '_this') {
-      if (document.querySelector(`iframe[name="${target}"]`)) return null
-    }
-
+    // Check if there's an existing iFrame, and don't do anything if so
+    if (document.querySelector(`iframe[name="${target}"]`)) return null
     // This comes after the iFrame check so that normal iFrame targeting is preserved
     e.preventDefault()
 
@@ -64,7 +62,7 @@ function ajax(rawUrl, method, formData, target) {
     }
 
     const opts = { method }
-    // Add the form's body to the
+    // Add data to the request, if appropriate
     if (method !== 'GET' && method !== 'DELETE') {
       opts.body = formData
     } else if (formData != null) { // != null checks for both null and undefined
@@ -91,13 +89,12 @@ function ajax(rawUrl, method, formData, target) {
   * @param {Document | Element} node
   */
 function processNode(node) {
-  // #1 forms can PUT, PATCH, and DELETE
+  // Find all the forms
   const forms = node.querySelectorAll('form')
   for (const form of forms) {
     const method = form.getAttribute('method')
     const target = form.getAttribute('target') || undefined
     // Only process forms that a) have subtree targets or b) have new methods
-    // TODO move this into query selector?
     if (target || ADDITIONAL_FORM_METHODS.includes(method)) {
       const url = form.getAttribute('action')
       const formData = new FormData(form)
@@ -105,7 +102,7 @@ function processNode(node) {
     }
   }
 
-  // #2 buttons can make requests on their own
+  // Find the buttons with an action attribute
   const buttons = node.querySelectorAll('button[action]')
   for (const button of buttons) {
     const url = button.getAttribute('action')
@@ -125,7 +122,7 @@ function processNode(node) {
     const target = link.getAttribute('target')
 
     const url = link.getAttribute('href')
-    if (!EXISTING_TARGET_KEYWORDS.includes(target) ) {
+    if (url && !EXISTING_TARGET_KEYWORDS.includes(target) ) {
       link.addEventListener('click', ajax(url, 'GET', undefined, target))
     }
   }
