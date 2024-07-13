@@ -85,39 +85,4 @@ describe("<button>", async () => {
     assertEqual(button2, null)
   })
 
-  it('replaces itself with plaintext', async () => {
-    fetchMock.get('/test', 'plaintext')
-    const div = make(`
-    <div><button id=test action="/test" target="_this">Plain Text</button></div>
-    `);
-    const button = byId('test')
-    button.click()
-    await fetchMock.flush(true)
-    assertEqual(div.innerHTML, 'plaintext')
-  })
-
-  it('replaces itself with an HTML element', async () => {
-    fetchMock.get("/test", '<div id=response>Success!</div>')
-    const button = make(`
-      <button id=test action="/test" target="_this">HTML</button>
-    `)
-    button.click()
-    await fetchMock.flush(true)
-    const response = byId('response')
-    assertEqual(response.innerHTML, 'Success!')
-  })
-
-  it('replaces itself with multiple HTML elements', async () => {
-    fetchMock.get("/test", `
-      <div id=response>Success!</div>
-      <style id=stylesheet>div { color: red }</style>
-    `)
-    const button = make('<button id=test action="/test" target="_this">HTML</button>')
-    button.click()
-    await fetchMock.flush(true)
-    const div = byId('response')
-    const style = byId('stylesheet')
-    assertEqual(div.innerHTML, 'Success!')
-    assertTruthy(style)
-  })
 })

@@ -8,7 +8,7 @@ describe("<form>", async () => {
     clearWorkArea()
   })
 
-  it('issues PUT requests', async () => {
+  it('makes a PUT request', async () => {
     fetchMock.put((url, options) => {
       assertEqual(url, '/test')
       assertEqual(options.body.get('i1'), 'test')
@@ -26,7 +26,7 @@ describe("<form>", async () => {
     assertTruthy(find('#response'))
   })
 
-  it('issues PATCH requests', async () => {
+  it('makes a PATCH request', async () => {
     fetchMock.patch((url, options) => {
       assertEqual(url, '/test')
       assertEqual(options.body.get('i1'), 'test')
@@ -44,7 +44,7 @@ describe("<form>", async () => {
     assertTruthy(find('#response'))
   })
 
-  it('issues DELETE requests', async () => {
+  it('makes a DELETE request', async () => {
     fetchMock.delete((url, options) => {
       assertEqual(url, '/test?i1=test')
       assertNull(options.body)

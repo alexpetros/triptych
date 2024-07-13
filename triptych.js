@@ -13,8 +13,8 @@ function replacePage(html, url, addHistory) {
     history.replaceState(state, "")
   }
 
+  // Replace the page's HTML and, if applicable, add it to the history state
   document.querySelector('html').innerHTML = html
-  // If we didn't just pop the state (i.e. "go back"), then push the new state to history
   if (addHistory) history.pushState({ html, url }, "", url)
 
 
@@ -44,7 +44,7 @@ function ajax(rawUrl, method, formData, target) {
 
   /** @param {Event} e */
   return async (e) => {
-    // Check if there's an existing iFrame, and don't do anything if so
+    // End immediately if there's an iFrame with the target name
     if (document.querySelector(`iframe[name="${target}"]`)) return null
     // This comes after the iFrame check so that normal iFrame targeting is preserved
     e.preventDefault()
@@ -62,9 +62,10 @@ function ajax(rawUrl, method, formData, target) {
     }
 
     const opts = { method }
-    // Add data to the request, if appropriate
+    // If the methods allow for request bodies, add the data there
     if (method !== 'GET' && method !== 'DELETE') {
       opts.body = formData
+    // Otherwise, if there is formData at all, add it to the URL params
     } else if (formData != null) { // != null checks for both null and undefined
       const queryParams = (new URLSearchParams(formData)).toString()
       url += '?' + queryParams

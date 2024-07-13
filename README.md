@@ -39,7 +39,8 @@ I outline the rationale for these proposals in [this talk I gave at Big Sky Dev 
 The standards proposals for each of these issues is forthcoming - if you're interested in working on
 that reach out to me!
 
-Inspired by [htmx](https://htmx.org/), [htmz](https://leanrada.com/htmz/), and the entire ecosystem of attribute-based hypermedia libraries.
+Inspired by [htmx](https://htmx.org/), [htmz](https://leanrada.com/htmz/), and the entire ecosystem
+of attribute-based hypermedia libraries.
 
 ## Installation
 
@@ -94,7 +95,6 @@ You can also play around with manual tests by running `npm run dev`
 ### To-do
 
 * Add full-page tests that verify existing GET/POST forms are not affected
-* Push new methods to history
 
 ## FAQ
 
@@ -111,4 +111,7 @@ appropriately. It's not deployed to a CDN yet, but will be soon.
 
 ### What if multiple elements match the target?
 
-Targeting is done using the [querySelector API](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), which performs a depth-first pre-order traversal of the document's nodes. The target will be the first matching element found, per that algorithm.
+Targeting is done using the [querySelector
+API](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), which performs a
+depth-first pre-order traversal of the document's nodes. The target will be the first matching
+element found, per that algorithm.

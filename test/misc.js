@@ -22,7 +22,7 @@ describe("Misc", async () => {
   })
 
 
-  it('old methods are case-independent', async () => {
+  it('old methods are case-insensitive', async () => {
     fetchMock.get('/test', '<div id=response>success</div>')
     const button = make('<button id=test action="/test" target="_this" method=get>Plain Text</button>')
     button.click()
@@ -31,7 +31,7 @@ describe("Misc", async () => {
     assertTruthy(find('#response'))
   })
 
-  it('new methods are case-independent', async () => {
+  it('new methods are case-insensitive', async () => {
     fetchMock.put('/test', '<div id=response>success</div>')
     const button = make('<button id=test action="/test" target="_this" method=put>Plain Text</button>')
     button.click()
