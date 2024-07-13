@@ -1,25 +1,26 @@
 # Triptych - Polyfill for three small HTML proposals
 
-Replace `<main>` with the result of `GET /home:`
+When the link is clicked, replace `<main>` with the result of `GET /home:`
+
 ```html
 <a href=/home target="main">Home</a>
-<main></main>
+<main> <!-- Existing page content --> </main>
 ```
 
-Replace the whole page with the result of `DELETE /users/354`:
+When the button is clicked, replace the whole page with the result of `DELETE /users/354`:
 ```html
 <button action=/users/354 method=DELETE></button>
 ```
 
-Replace the button with the result of `DELETE /users/354`
+When the button is clicked, replace the button with the result of `DELETE /users/354`
 ```html
-<button action=/users/354 method=DELETE target="_this"></button>
+<button action=/users/354 method=DELETE target=_this></button>
 ```
 
-Replace the #user-info `<div>` with the result of `PUT /users/354`
+When the form is submitted, replace `<div id=user-info>` with the result of `PUT /users/354`
 ```html
 <div id=user-info></div>
-<form action="/users/354" method=PUT target="#user-info">
+<form action=/users/354 method=PUT target=#user-info>
   <input type=text name=name>
   <input type=text name=bio>
   <button>Submit</button>
@@ -106,7 +107,6 @@ You can also play around with manual tests by running `npm run dev`
 ### To-do
 
 * Add full-page tests that verify existing GET/POST forms are not affected
-* CSS classes that replicate possible pseudo-classes (i.e. for a request in progress)
 
 ## FAQ
 

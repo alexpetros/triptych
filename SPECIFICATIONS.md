@@ -1,6 +1,6 @@
 # Specifications
 
-This is a document in which I'm keeping track of the various technical decisions I'm making in the
+The purpose of this document is to keep track of the various technical decisions I'm making in the
 polyfill, so that the proposals can be built out with the necessary specificity.
 
 ## Hyperlinks
@@ -24,16 +24,16 @@ polyfill, so that the proposals can be built out with the necessary specificity.
   elements, then nothing happens
 - Add additional `_this` keyword which targets the element that made the request (`_self` is taken)
 
-# Navigation
+## Navigation
 - History is only saved if there is a full-page navigation
 - Back button will show the page as it was when the navigation occurred (including any partial,
   non-navigation replacements that happened). This mimics existing navigation behavior
-- History is only saved if there is a full-page navigation
 
 ## Misc
 - Query strings are dropped from the URL, to mimic ([4.10.22.3](https://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#form-submission-algorithm))
 
 
 # Unresolved
-- Should there be a history toggle?
-- Should buttons implement existing iFrame and "special" targets
+- CSS classes that replicate possible pseudo-classes (i.e. for a request in progress)
+- Toggle that allows you to specify that a replacement *should* trigger a page replacement
+- Should buttons implement existing iFrame and "special" targets?
