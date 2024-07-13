@@ -44,33 +44,43 @@ of attribute-based hypermedia libraries.
 
 ## Installation
 
-Include triptych as a script in your HTML:
+There is no CDN yet, but even if I upload it to one,
+[you probably shouldn't use it.](https://blog.wesleyac.com/posts/why-not-javascript-cdn).
+
+Instead, install it like this:
+
+1. Copy `./triptych.js` to a folder in your project, i.e. `/vendor/triptych-0.1.0.js`
+1. Serve it at that URL with a really long cache time (I usually set it to a year)
+1. Include it in your document like this:
 
 ```html
-<script src="triptych.js"></script>
+<script src="/vendor/triptych-0.1.js"></script>
 ```
+
+I will upload it to `npm` soon, so you can include it as a dependency and serve it straight from
+node modules (instead of copying).
 
 ## Design Goals
 
 This project aims to demonstrate the efficacy of the above three HTML enhancements, to advocate for
 their addition to the HTML standard, and to provide that functionality until then.
 
-Because the ultimate goal of Triptych is to be incorporated into the HTML standard, it does not
-use namespaced custom attributes, but instead uses existing (or plausible) HTML standard attributes
-in a backwards compatible manner. Much of the script's complexity results from the need to not break
-existing uses of attributes like `target` or `method`.
+Because the goal of Triptych is to be incorporated into the HTML standard, it does not use
+namespaced custom attributes (like `ng-*`, `hx-*`, and so on), but instead uses existing (or
+plausible) HTML standard attributes in a backwards compatible manner. Much of the script's
+complexity results from the need to not break existing uses of attributes like `target` or `method`.
 
 ## Limitations
 
 Because these features are meant to be incorporated into the standard, they simulate the desired
 browser behavior, up to the limit of JavaScript's ability.
 
-The main limitation involves full page navigations. When submitting a POST form, the default
+The main limitation involves full page navigation. When submitting a POST form, the default
 behavior is to push that URL onto the URL bar and displays the resulting HTML from the form;
 clicking the refresh button resubmits the POST request—after the user confirms that they intended
 this.
 
-When "target"s are not supplied on buttons and forms, Triptych simulates the full-page behavior to
+When `target`s are not supplied on buttons and forms, Triptych simulates the full-page behavior to
 the best of its ability. It replaces the entire document and uses the
 [history API](https://developer.mozilla.org/en-US/docs/Web/API/History) to update the browser URL
 and history. Clicking "back" should basically work as expected.
@@ -81,7 +91,8 @@ benefit of doing a POST-redirect pattern—that it resets the current JS environ
 
 Also, for all of these requests, the browser should show a loading bar, the same way that
 clicking on a link does. This behavior is impossible to simulate in JavaScript but would
-significantly benefit the user if incorporated into the browser.
+significantly benefit the user if incorporated into the browser—it's one of the main things lacking
+from *all* JavaScript frameworks.
 
 ## Development
 
@@ -95,6 +106,7 @@ You can also play around with manual tests by running `npm run dev`
 ### To-do
 
 * Add full-page tests that verify existing GET/POST forms are not affected
+* CSS classes that replicate possible pseudo-classes (i.e. for a request in progress)
 
 ## FAQ
 

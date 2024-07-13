@@ -18,13 +18,21 @@ polyfill, so that the proposals can be built out with the necessary specificity.
 - Forms support the PUT, PATCH, and DELETE methods
 - Forms support the `target` attribute, and replace the target instead of the whole page
 
-## Targeting
-- If the `target` is an invalid query selector, or does not appear
+## Targeting and Replacement
 - If the `target` is a preexisting special keyword or iFrame, preexisting behavior takes precedence
-- Add additional `_this` keyword which targets the element that made the request
+- If the `target` is an invalid query selector, or a query selector that does not return any
+  elements, then nothing happens
+- Add additional `_this` keyword which targets the element that made the request (`_self` is taken)
+
+# Navigation
+- History is only saved if there is a full-page navigation
+- Back button will show the page as it was when the navigation occurred (including any partial,
+  non-navigation replacements that happened). This mimics existing navigation behavior
+- History is only saved if there is a full-page navigation
 
 ## Misc
 - Query strings are dropped from the URL, to mimic ([4.10.22.3](https://www.w3.org/TR/2011/WD-html5-20110525/association-of-controls-and-forms.html#form-submission-algorithm))
+
 
 # Unresolved
 - Should there be a history toggle?

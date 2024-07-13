@@ -3,10 +3,12 @@ var ADDITIONAL_FORM_METHODS = ['PUT', 'PATCH', 'DELETE']
 var EXISTING_TARGET_KEYWORDS = ['_self', '_blank', '_parent', '_top', '_unfencedTop']
 
 /**
-  * @param {string} html
-  * @param {string} url
-  * @param {boolean} addHistory
-  */
+ * Mimic a full-page navigattion with the history API and a full-document replacement.
+ *
+ * @param {string} html
+ * @param {string} url
+ * @param {boolean} addHistory
+ */
 function replacePage(html, url, addHistory) {
   if (!history.state) {
     const state = { html: document.documentElement.innerHTML, url: window.location.href }
@@ -32,11 +34,13 @@ function replacePage(html, url, addHistory) {
 }
 
 /**
-  * @param {string} rawUrl
-  * @param {string} method
-  * @param {FormData} formData
-  * @param {string} target
-  */
+ * Return the function that performs the request and replacement when fired
+ *
+ * @param {string} rawUrl
+ * @param {string} method
+ * @param {FormData} formData
+ * @param {string} target
+ */
 function ajax(rawUrl, method, formData, target) {
   // Remove the query string form the URL, if it's present
   const queryIndex = rawUrl.indexOf('?')
@@ -49,6 +53,7 @@ function ajax(rawUrl, method, formData, target) {
     // This comes after the iFrame check so that normal iFrame targeting is preserved
     e.preventDefault()
 
+    // Replace self if the target is `_this`, otherwise replace the target from a querySelector
     let targetElement
     if (target === '_this') {
       targetElement = e.target
@@ -62,7 +67,7 @@ function ajax(rawUrl, method, formData, target) {
     }
 
     const opts = { method }
-    // If the methods allow for request bodies, add the data there
+    // If the methods allow for request bodies, add the data to the request body
     if (method !== 'GET' && method !== 'DELETE') {
       opts.body = formData
     // Otherwise, if there is formData at all, add it to the URL params
@@ -87,8 +92,10 @@ function ajax(rawUrl, method, formData, target) {
 }
 
 /**
-  * @param {Document | Element} node
-  */
+ * Add Triptych functionality to this DOM node and all its children
+ *
+ * @param {Document | Element} node
+ */
 function processNode(node) {
   // Find all the forms
   const forms = node.querySelectorAll('form')
