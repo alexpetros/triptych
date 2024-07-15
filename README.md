@@ -46,17 +46,20 @@ of attribute-based hypermedia libraries.
 ## Installation
 
 There is no CDN yet, but even if I upload it to one,
-[you probably shouldn't use it.](https://blog.wesleyac.com/posts/why-not-javascript-cdn).
+[you probably shouldn't use it](https://blog.wesleyac.com/posts/why-not-javascript-cdn).
 
 Instead, install it like this:
 
-1. Copy `./triptych.js` to a folder in your project, i.e. `/vendor/triptych-0.1.0.js`
+1. Copy `triptych.js` to a folder in your project, i.e. `/vendor/triptych-0.1.0.js`
 1. Serve it at that URL with a really long cache time (I usually set it to a year)
 1. Include it in your document like this:
 
 ```html
-<script src="/vendor/triptych-0.1.js"></script>
+<script src="/vendor/triptych-0.1-0.js"></script>
 ```
+
+Make sure to include the version number in the file name so that if/when you update it, the users
+who have it cached will download the new version.
 
 I will upload it to `npm` soon, so you can include it as a dependency and serve it straight from
 node modules (instead of copying).
@@ -107,6 +110,7 @@ You can also play around with manual tests by running `npm run dev`
 ### To-do
 
 * Add full-page tests that verify existing GET/POST forms are not affected
+* Investigate server-side re-targeting controls (probably headers)
 
 ## FAQ
 
