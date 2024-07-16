@@ -1,47 +1,78 @@
-# Triptych - Polyfill for three small HTML proposals
+# Triptych - New Attributes for HTML
 
+Triptych is a polyfill for three small HTML proposals:
+
+- Support PUT and DELETE on forms
+- Enable buttons to make HTTP requests without being wrapped in forms
+- Enable links, forms, and buttons to target a part of the DOM for replacement
+
+Work on these proposals is in progress, and I'll link them here when they're up.
+If you're interested in working on that, reach out to me!
+
+## Examples
 When the link is clicked, replace `<main>` with the result of `GET /home:`
 
 ```html
-<a href=/home target="main">Home</a>
+<a href="/home" target="main">Home</a>
 <main> <!-- Existing page content --> </main>
 ```
 
 When the button is clicked, replace the whole page with the result of `DELETE /users/354`:
 ```html
-<button action=/users/354 method=DELETE></button>
+<button action="/users/354" method="DELETE"></button>
 ```
 
 When the button is clicked, replace the button with the result of `DELETE /users/354`
 ```html
-<button action=/users/354 method=DELETE target=_this></button>
+<button action="/users/354" method="DELETE" target="_this"></button>
 ```
 
 When the form is submitted, replace `<div id=user-info>` with the result of `PUT /users/354`
 ```html
-<div id=user-info></div>
-<form action=/users/354 method=PUT target=#user-info>
-  <input type=text name=name>
-  <input type=text name=bio>
+<div id="user-info"></div>
+<form action="/users/354" method="PUT" target="#user-info">
+  <input type="text" name="name">
+  <input type="text" name="bio">
   <button>Submit</button>
 </form>
 ```
 
-## Background
-These three, small additions to HTML dramatically expand its expressive power, and make plain HTML
-compelling for a variety of interactive web applications:
+## Background and Design Goals
 
-- Enable buttons to make HTTP requests without wrapping them in forms
-- Enable forms and buttons to make PUT, PATCH, and DELETE requests
-- Enable links, forms, and buttons to target a part of the DOM for replacement
-
-I outline the rationale for these proposals in [this talk I gave at Big Sky Dev Con
+Triptych is a standards-compatible implementation of a featureset that is both core to HTML, and has
+a lot of recent traction in the library ecosystem: declarative HTTP requests and partial page
+replacement. I outline the rationale for these proposals in [this talk I gave at Big Sky Dev Con
 2024](https://unplannedobsolescence.com/blog/life-and-death-of-htmx/).
-The standards proposals for each of these issues is forthcoming - if you're interested in working on
-that reach out to me!
 
-Inspired by [htmx](https://htmx.org/), [htmz](https://leanrada.com/htmz/), and the entire ecosystem
-of attribute-based hypermedia libraries.
+HTML has always supported declarative requests. The hyperlink is fundamental to the grammar of the
+web, and the `<a>` tag lets developers specify an HTTP request and subsequent page navigation. HTML
+2.0 introduced `<form>` elements, which lets developers specify an alternate HTTP Method (`POST`)
+and take user input either via URL query parameters or request bodies.
+
+The existing semantics for declarative HTTP requests have two major missing pieces: they do not
+support the full set of HTTP Methods (specifically `PUT`, `PATCH`, and `DELETE`), and they only
+support the relatively strict paradigms of navigation and form submission.
+
+The library ecosystem shows significant demand for these two features, as well as a third: partial
+replacement of the DOM with the results of that network request. The
+[buzziest](https://risingstars.js.org/2023/en#section-framework) library that supports these
+features is [htmx](https://htmx.org/), but it is far from alone. 37Signals (which invented Ruby on
+Rails) maintains [Hotwired](https://hotwired.dev/), an HTML-over-the-wire framework with an HTML
+interface, [Turbo](https://turbo.hotwired.dev/), for partial page replacement.
+[Unpoly](https://unpoly.com/) adds attributes that let you target fragments of the page to get
+replaced, and supports the full range of HTTP methods.
+
+Triptych is an attempt to incorporate in attributed-based DOM replacement into the HTML standard, in
+a manner that best fits existing HTML semantics. It aims to demonstrate the efficacy of these
+proposals, to advocate for their addition to the HTML standard, and to provide that functionality as
+a polyfill until then. Its design is primarily inspired by [htmx](https://htmx.org/) and
+[htmz](https://leanrada.com/htmz/).
+
+Because the goal of Triptych is to be incorporated into the HTML standard, it does not use
+namespaced custom attributes (like `ng-*`, `hx-*`, and so on), but instead uses existing (or
+plausible) HTML standard attributes in a backwards compatible manner. Much of the script's
+complexity results from the need to not break existing uses of attributes like `target` or `method`.
+
 
 ## Installation
 
@@ -63,16 +94,6 @@ who have it cached will download the new version.
 
 I will upload it to `npm` soon, so you can include it as a dependency and serve it straight from
 node modules (instead of copying).
-
-## Design Goals
-
-This project aims to demonstrate the efficacy of the above three HTML enhancements, to advocate for
-their addition to the HTML standard, and to provide that functionality until then.
-
-Because the goal of Triptych is to be incorporated into the HTML standard, it does not use
-namespaced custom attributes (like `ng-*`, `hx-*`, and so on), but instead uses existing (or
-plausible) HTML standard attributes in a backwards compatible manner. Much of the script's
-complexity results from the need to not break existing uses of attributes like `target` or `method`.
 
 ## Limitations
 
@@ -111,6 +132,7 @@ You can also play around with manual tests by running `npm run dev`
 
 * Add full-page tests that verify existing GET/POST forms are not affected
 * Investigate server-side re-targeting controls (probably headers)
+* Investigate CSS attributes for in-progress requests
 
 ## FAQ
 
