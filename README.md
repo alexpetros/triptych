@@ -2,7 +2,7 @@
 
 Triptych is a polyfill for three small HTML proposals:
 
-- Support PUT and DELETE on forms
+- Support PUT, PATCH, and DELETE on forms
 - Enable buttons to make HTTP requests without being wrapped in forms
 - Enable links, forms, and buttons to target a part of the DOM for replacement
 
