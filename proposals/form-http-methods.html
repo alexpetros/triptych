@@ -59,10 +59,8 @@ Existing form controls (e.g. <code>action</code>, <code>enctype</code>) should o
 
 <h2 id=sample-usage>Sample Usage in Resource Lifecycle</h2>
 
-This section demonstrates how PUT and DELETE methods are necessary for managing the lifecycle of a
-resource.
-We use as an example a hypothetical hotel reservation service, in which users have the
-ability to book hotel rooms.
+This section demonstrates how PUT and DELETE methods are necessary for managing the lifecycle of a resource.
+We use as an example a hypothetical hotel reservation service, in which users have the ability to book hotel rooms.
 
 <p>
 All examples in this section assume that the host origin is https://example.com.
@@ -70,11 +68,8 @@ All examples in this section assume that the host origin is https://example.com.
 <h3 id=basic-create-form>Creating A Resource</h3>
 
 <p>
-First, the user makes a reservation using a traditional POST form:<f-note>While PUT is capable of
-creating new resources, POST is preferred when the service
-<q><a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.4-10">selects a proper URI on
-behalf of the client.</a></q>
-This is the simplest RESTful pattern, and has the additional benefit of using a non-idempotent method, so the browser can guard against double reservations.
+First, the user makes a reservation using a traditional POST form:<f-note>While PUT is capable of creating new resources, POST is preferred when the service <q><a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.4-10">selects a proper URI on behalf of the client.</a></q>
+This is the simplest RESTful pattern, and has the additional benefit of using a non-idempotent method, so the browser can guard against creating two new things when only one is desired.
 More benefits to using this pattern will be discussed in the justifications section.
 </f-note>
 </p>
@@ -109,8 +104,6 @@ HTTP/1.1 303 SEE OTHER
 Location: /reservations/123
 </pre>
 
-
-
 <h3 id=basic-put-form>Updating A Resource</h3>
 
 <p>
@@ -129,7 +122,10 @@ their reservation:
 </pre>
 
 
-This new form offers the same controls as the POST form, but with some key differences:
+This new form offers the same controls as the POST form, but with some key differences:<f-note>
+The significance of these changes will be discussed more in <section-ref ref=completing-rest>Section 5</section-ref>.
+</f-note>
+
 
 <ul>
   <li>The action has changed from <code>/reservations</code> to <code>/reservations/123</code>
@@ -288,7 +284,7 @@ To start, browsers should prohibit cross-origin requests with the new methods.
 <p>
 CORS support can be added later.
 
-<h2>Completing REST</h2>
+<h2 id=completing-rest>Completing REST</h2>
 In 2000, Roy Fielding published a PhD dissertation in which he introduced the Representational State
 Transfer (REST) architectural style for distributed hypermedia systems.
 While these principles were used to guide the early development of the World Wide Web, they are
@@ -689,6 +685,17 @@ other methods.
 
 
 <script>
+// Create <section-ref> element
+class SectionRef extends HTMLElement {
+  connectedCallback() {
+    const content = this.innerHTML
+    const ref = this.attributes.ref.value
+    this.innerHTML = `<a href="#${ref}">${content}</a>`
+  }
+}
+
+customElements.define('section-ref', SectionRef)
+// Create <f-note> element
 class Footnote extends HTMLElement {
   static numFootnotes = 0
 
@@ -700,10 +707,9 @@ class Footnote extends HTMLElement {
     this.innerHTML = `<sup id="fn-${this.num}"><a href="#ref-${this.num}">[${this.num}]</a></sup>`
   }
 }
-
 customElements.define('f-note', Footnote)
 
-// Create footnotes
+// Create footnotes section
 const footnotesSection = document.querySelector('section.footnotes')
 const footnotes = document.querySelectorAll('f-note')
 for (footnote of footnotes) {
@@ -720,7 +726,8 @@ const headings = document.querySelectorAll('h2,h3')
 const topList = document.createElement('ol')
 let currentH2
 for (heading of headings) {
-  heading.id = heading.innerText.replace(' ', '-')
+  // Create an id if one doesn't exist
+  heading.id = heading.id || heading.innerText.replace(' ', '-')
   if (heading.tagName === 'H2') {
     currentH2 = document.createElement('li')
     currentH2.innerHTML = `<a href="#${heading.id}">${heading.innerText}</a><ol></ol>`
