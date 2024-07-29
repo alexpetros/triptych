@@ -1,0 +1,740 @@
+<!DOCTYPE HTML>
+<title>Support PUT, PATCH, and DELETE in HTML Forms</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="./proposal.css">
+
+<h1>Support PUT, PATCH, and DELETE in HTML Forms</h1>
+
+<dl>
+  <dt>Author</dt>
+  <dd>Alexander Petros <a href="mailto:contact@alexpetros.com">(contact@alexpetros.com</a>)</dd>
+  <dt>Date Created</dt>
+  <dd>July xx, 2024
+  <dt>Last Updated</dt>
+  <dd>July xx, 2024
+  <dt>Status</dt>
+  <dd style="color: red;">Unpublished</dd>
+
+</dl>
+
+<details class=toc open>
+<summary>Table of Contents</summary>
+<noscript>
+  The table of contents is generated with JavaScript, which you have disabled.
+</noscript>
+</details>
+
+
+<h2>Summary</h2>
+<p>
+A proposal for adding PUT, PATCH, and DELETE support to HTML forms.
+
+<p>
+Proposal 1/3 in the <a href=/triptych>Triptych Proposals</a>.
+
+<h3>Goals</h3>
+<p>
+PUT, PATCH, and DELETE support in forms should:
+
+<ul>
+  <li>be the path of least friction for developing RESTful web services
+  <li>integrate seamlessly with existing form semantics
+  <li>integrate with existing servers and frameworks that support those methods
+  <li>not introduce new security considerations
+</ul>
+
+<h2 id=proposed-changes>Proposed Changes</h2>
+<p>
+New values for the form <code>method</code> attribute:
+<ul>
+  <li><code>PUT</code> - makes the form issue a PUT request
+  <li><code>PATCH</code> - makes the form issue a PATCH request
+  <li><code>DELETE</code> - makes the form issue a DELETE request
+</ul>
+
+<p>
+All new method keywords are case insensitive.
+Existing form controls (e.g. <code>action</code>, <code>enctype</code>) should operate identically.
+
+<h2 id=sample-usage>Sample Usage in Resource Lifecycle</h2>
+
+This section demonstrates how PUT and DELETE methods are necessary for managing the lifecycle of a
+resource. We use as an example a hypothetical hotel reservation service, in which users have the
+ability to book hotel rooms.
+
+<p>
+All examples in this section assume that the host origin is https://example.com.
+
+<h3 id=basic-create-form>Creating A Resource</h3>
+
+<p>
+First, the user makes a reservation using a traditional POST form:<f-note>While PUT is capable of
+creating new resources, POST is preferred when the service
+<q><a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.4-10">selects a proper URI on
+behalf of the client.</a></q> This is the simplest RESTful pattern, and has the additional
+benefit of using a non-idempotent method, so the browser can guard against double reservations.
+More benefits to using this pattern will be discussed in the justifications section.
+</f-note>
+</p>
+
+<pre class=code>
+&lt;form action="/reservations" method="POST"&gt;
+  &lt;input type="text" name="name"&gt;
+  &lt;input type="date" name="check-in"&gt;
+  &lt;input type="date" name="check-out"&gt;
+  &lt;input type="checkbox" name="has-pets"&gt;
+  &lt;button&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+The browser will send the following HTTP request:
+
+<pre class=code>
+POST /reservations HTTP/1.1
+Host: example.com
+Content-Type: application/x-www-form-urlencoded
+...
+name=Alex%20Petros&check-in=2024-12-01&check-out=2024-12-02&has-pets=on
+</pre>
+
+And the server responds with a redirect to the newly-created reservation resource:<f-note>
+The <a href="https://www.rfc-editor.org/rfc/rfc9110#section-15.4.4-1">303 SEE OTHER</a> status code is used here because it directs the agent to make the subsequent request as GET, regardless of what method the original request used. 302 FOUND does not do this this, but for historical reasons, browsers <a href="https://www.rfc-editor.org/rfc/rfc9110#section-15.4.3-3.1">typically change POST to GET</a>, while leaving PUT, PATCH, and DELETE methods as is. For this reason, we use 303 for everything.
+</f-note>
+
+
+<pre class=code>
+HTTP/1.1 303 SEE OTHER
+Location: /reservations/123
+</pre>
+
+
+
+<h3 id=basic-put-form>Updating A Resource</h3>
+
+<p>
+At the reservation page, the user is presented with two forms. The first one allows them to adjust
+their reservation:
+
+
+<pre class=code>
+&lt;form action="/reservations/123" method="PUT"&gt;
+  &lt;input type="text" name="name" value="Alex Petros"&gt;
+  &lt;input type="date" name="check-in" value="2024-12-01"&gt;
+  &lt;input type="date" name="check-out" value="2024-12-02"&gt;
+  &lt;input type="checkbox" name="has-pets" checked&gt;
+  &lt;button&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+
+This new form offers the same controls as the POST form, but with some key differences:
+
+<ul>
+  <li>The action has changed from <code>/reservations</code> to <code>/reservations/123</code>
+  <li>The method has changed from <code>POST</code> to <code>PUT</code>
+  <li>The forms are pre-filled with the values saved at the server.
+</ul>
+
+<p>
+If the user changes the check-out date to <code>2024-12-03</code>, the browser will send the
+following request:
+
+
+<pre class=code>
+PUT /reservations/123 HTTP/1.1
+Host: example.com
+Content-Type: application/x-www-form-urlencoded
+...
+name=Alex%20Petros&check-in=2024-12-01&check-out=2024-12-03&has-pets=on
+</pre>
+
+
+The server can then choose to either send back a new page or redirect to one.
+
+<h3 id=basic-delete-form>Deleting A Resource</h3>
+
+The second form on the reservation page allows the user to delete their reservation:
+
+
+<pre class=code>
+&lt;form action="/reservations/123" method="DELETE"&gt;
+  &lt;button&gt;Delete Reservation&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+
+Clicking "Delete Reservation" would result in the following HTTP request:
+
+
+<pre class=code>
+DELETE /reservations/123 HTTP/1.1
+Host: example.com
+</pre>
+
+
+And the server could choose to either send a delete confirmation page, or redirect elsewhere.
+
+
+<h2>Additional Considerations</h2>
+<h3>Navigation</h3>
+<h4>Rendering</h4>
+If the response status code is not a redirection code (300-399), the browser should display the body
+of the response in the page, exactly the same way it would for the response of a POST form. It
+should likewise update the page URL and history.
+
+<h4>Redirection</h4>
+<p>
+For PUT, PATCH, and DELETE requests, if the server responds with a 301, 302, or 307 status code, the
+browser should perform a subsequent request with the same HTTP method; if the server responds with a
+303 status code, the browser should perform a subsequent request as a GET request.
+
+<p>
+When browsers receive a 302 response to a POST form, they typically follow that redirect
+automatically and change the method to GET; there is no need for this behavior to apply to PUT,
+PATCH, and DELETE. Changing POST to GET in this fashion is a backwards compatibility carveout in the
+spec, which has not been applied to other methods in browsers' fetch implementations. Using a 303
+instead of a 302 is already a well-understood pattern for server frameworks that support
+these methods, so no additional carveouts are needed to integrate with them.<f-note>
+For instance, <a
+  href="https://stackoverflow.com/questions/33214717/why-post-redirects-to-get-and-put-redirects-to-put">ExpressJS</a>
+and <a href="https://stackoverflow.com/questions/71975005/rails-not-redirecting-on-put-request-sending-406-back-instead">Rails</a>.
+</f-note>
+
+<p>
+This resolves a blocker for the original Firefox beta implementation.<f-note>
+<a href="https://lists.w3.org/Archives/Public/public-html-comments/2011Apr/0000.html">
+On 01/12/2011, at 9:57 PM, Julian Reschke wrote:</a>
+<q>One thing I forgot earlier, and which was the reason why I actually wanted PUT and DELETE
+temporarily (!) on hold is redirect handling. The experimental Firefox implementation was copying
+the redirect handling for POST (with respect to method rewriting), and it would have been bad to let
+this get into the deployed platform. The experimental Firefox implementation was copying the
+redirect So it would be good to clarify that PUT and DELETE, when being redirected by 301/302 should
+*not* be rewritten to GET.</q>
+</f-note>
+
+<h4>Refresh Behavior</h4>
+<p>
+Need to make a decision here about whether to re-submit idempotent requests, or switch to GET. I am
+softly in favor of the former.
+
+
+<h3 id=body-content>Body Content</h3>
+
+<p>
+PUT and PATCH forms should send identical content to their POST equivalents.<f-note>
+<a href="https://www.rfc-editor.org/rfc/rfc9110.html#appendix-B.3-5">"Content" was previously known
+  as "payload"</a> or "payload body", and is set using the <code>body</code> property of a fetch
+request.
+</f-note>
+
+All three methods support the same Content-Type headers, and they are differentiated from each
+other based on the intent for the enclosed representation, not the representation itself.<f-note>
+Per <a href="https://www.rfc-editor.org/rfc/rfc9110.html#name-put">RFC9110</a>, the difference
+between POST and PUT <q>is highlighted by the different intent for the enclosed representation,</q>
+which implies that they support the same set of representations. Per
+<a href="https://www.rfc-editor.org/rfc/rfc5789">RF5789</a>, which defines PATCH, <q>the
+difference between the PUT and PATCH requests is reflected in the way the server processes the
+enclosed entity to modify the resource</q>, which again implies that they are capable of
+representing resources the same way.
+</f-note>
+Server frameworks that support PUT and PATCH handle their bodies identically to POST bodies;
+the addition of these methods to HTML will be supported by a significant percentage of servers out
+of the gate.<f-note>Citation needed.</f-note>
+
+<p>
+DELETE forms should format their content as URL parameters, like GET forms. While both GET and
+DELETE body semantics are technically undefined, including content in the request body is somewhat
+discouraged by the spec.<f-note>
+While <a href="https://www.rfc-editor.org/rfc/rfc9110.html#name-delete">RFC9110</a> states that a
+<q>DELETE request has no generally defined semantics,</q> it also states that <q>a client SHOULD NOT
+generate content in a DELETE request unless it is made directly to an origin server that has
+previously indicated, in or out of band, that such a request has a purpose and will be adequately
+supported</q>. While one could certainly argue that the server returning HTML with <code>&lt;form
+  method=DELETE&gt;</code> constitutes indication of support for content, we defer to the library
+ecosystem, which generally understands the similar language in the GET and DELETE specs as a tacit
+discouragement of body content for both.
+</f-note>
+Therefore, forms with <code>method=DELETE</code> should encode their inputs as part the URI,
+emulating the behavior of forms with no <code>method</code>, or <code>method=GET</code>.
+
+<h3>Caching</h3>
+<p>
+PUT, PATCH, and DELETE requests are <a href="https://httpwg.org/specs/rfc9110.html#safe.methods">
+unsafe</a> (not read-only), and therefore can never be cached.
+
+<p>
+PATCH <em>responses</em> are technically cacheable in the same way that POST responses are: if
+certain information is explicitly provided, subsequent GET requests may use the cached PATCH
+response to represent that resource.<f-note>
+<a href="https://www.rfc-editor.org/rfc/rfc5789#section-2">RFC 5789 Section 2</a>,
+</f-note> Browsers that implement this behavior for POST requests should do so for PATCH requests,
+although the spec notes that the overwhelming majority of cache implementations do not.<f-note>
+<a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.3-2">RFC 9110 Section 9.2.3</a>,
+
+<p>
+PUT and DELETE responses are never cacheable.<f-note>
+<a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.4-13">RFC 9110 Section 9.3.4</a>,
+<a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.5-7">Section 9.3.5</a>
+</f-note>
+
+
+
+<h3>CORS</h3>
+<p>
+To start, browsers should prohibit cross-origin requests with the new methods.
+
+<p>
+CORS support can be added later.
+
+<h2>Completing REST</h2>
+In 2000, Roy Fielding published a PhD dissertation in which he introduced the Representational State
+Transfer (REST) architectural style for distributed hypermedia systems.
+While these principles were used to guide the early development of the World Wide Web, they are
+often badly misunderstood.<f-note>
+Carson Gross notes in <cite class=article><a href="https://htmx.org/essays/hateoas/">HATEOAS — An
+    Alternative Explanation</a></cite> that the <a
+  href="https://en.wikipedia.org/wiki/HATEOAS">Wikipedia Entry for "Hypertext as the engine of
+  application state"</a>, one REST's fundamental constraints, uses a JSON API as an example, even
+though JSON is not hypertext. Roy Fielding is less polite: in <cite class="article"><a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">REST APIs must
+    be hypertext-driven</a></cite>, he complains that a different "REST" API, which also did not user hypertext, has <q>so much coupling on display that it should be given an X rating.</q>
+</f-note>
+
+<p>
+Despite the misconceptions, REST remains the most powerful conceptual tool for building durable
+hypermedia applications.
+In this section, we make the case for how better method support in HTML can drive adoption of REST
+priciples and dramatically improve the median web application as a result.
+
+<!-- This explanation draws on his references to it in his , and Carson Gross' <a href="https://htmx.org/essays/hateoas/">"alternative -->
+<!-- explanation"</a> of the term. -->
+<h3>REST in Theory</h3>
+
+<p>
+In the dissertation that defines REST, Roy Fielding includes HTTP methods among the core interface
+constraints of REST—specifically the constraint that messages need to be self-describing.<f-note>
+<a href="https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_5">Section
+  5.1.5:</a> <q>REST enables intermediate processing by constraining messages to be self-descriptive:
+interaction is stateless between requests, standard methods and media types are used to indicate
+semantics and exchange information, and responses explicitly indicate cacheability.</q>
+</f-note>
+He does not, however, get into the specifics of which methods are necessary. His
+main concern is that the name of the method should not affect the parsing of the HTTP request, as
+that would require out-of-band agreement on method semantics and limit the extensibility of the
+method field.<f-note>
+<a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_3_1_2">
+  Section 6.3.1.2
+</a>
+</f-note>
+
+<p>
+Fielding actually appears to be somewhat ambivalent about whether the client should have
+<em>any</em> understanding of method semantics. He doesn't say too much more about HTTP methods in
+the dissertation, but in a comment on his blog, he writes:
+
+<blockquote>
+<q>You don’t get to decide what POST means — that is decided by the resource. Its purpose is
+supposed to be described in the same context in which you found the URI that you are posting to.</q><f-note>
+<a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-732">"Rest APIs Must be
+  Hypertext Driven"</a>, Comment #13
+</f-note>
+</blockquote>
+
+That GET, POST, and PUT have a semantic meaning outside the context of the application (GET is
+safe, POST is not, and so on) is a secondary concern; the primary obligation of the client is to
+allow the hypermedia API to describe itself, and then faithfully execute that description.<f-note>
+Since REST was designed to describe an infrastructure in which some HTTP methods already had semantic meaning, it's unlikely that Fielding would suggest we throw out that meaning
+  In a different comment on the same blog, Fielding refers to a GET request as a <a
+  href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-730">"retrieval
+  request"</a>, which suggests a willingness to include agreed-upon method semantics within the
+confines of a "self-describing" API.
+</f-note>
+The HTML form element's transformation of any non-GET, non-POST method into a GET violates this principle.<f-note>
+n.b. Fielding's <a
+href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be
+hypertext-driven" blog</a> does include the follow bullet:
+<q>A REST API should not contain any changes to the communication protocols aside from filling-out
+or fixing the details of underspecified bits of standard protocols, such as HTTP’s PATCH method or
+Link header field. Workarounds for broken implementations (such as those browsers stupid enough to
+believe that HTML defines HTTP’s method set) should be defined separately, or at least in
+appendices, with an expectation that the workaround will eventually be obsolete.</q> Exactly what he
+means by <q>browsers stupid enough to believe that HTML defines HTTP’s method set</q> is a little
+vague, but it clearly demonstrates frustration with HTML's limited method support.
+</f-note>
+
+<p>
+We do not propose that HTML execute arbitrary HTTP methods specified in the form's method attribute,
+although that would fit nicely within the REST guidelines by allowing web APIs to freely
+self-describe across an already-available dimension.<f-note>
+This is neverthless an intriguing idea.
+If HTML allowed the use of arbitrary HTTP methods, developers could pilot new
+<em>client networking semantics</em> in a backwards-compatible fashion.
+Of course, the implications of this are wide-ranging and far exceed the scope of this proposal.
+</f-note>
+Instead, we simply urge that HTML support the relevant, existing HTTP methods, which are so useful
+that they are universally-supported by servers in spite of their absence from the HTML standard.
+
+<!-- https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_3_1_2 -->
+
+<!-- <p> -->
+<!-- By presenting the user with both the current application state (the form values) and possible -->
+<!-- actions on that state (the input types and submit button), HTML is able to fulfill its duty as a -->
+<!-- uniform interface. -->
+
+
+<h3>REST in Practice</h3>
+
+<p>
+HTTP methods have become more central to the developer community's conception of REST than
+Fielding perhaps intended, and are one of its better-understood concepts.
+In Jeremy Richardson's <a href="https://www.crummy.com/writing/speaking/2008-QCon/act3.html">Maturity Heuristic</a>, later dubbed the
+<a href="https://martinfowler.com/articles/richardsonMaturityModel.html">"Richardson Maturity
+  Model"</a> by Martin Fowler, proper use of HTTP methods is one of the three levels that determine
+how well an application adheres to REST principles.<f-note>
+Both of these explicitly sidestep the "controversy" about whether PUT and DELETE
+should be supported by HTML. Fowler notes that in the absence of PUT and DELETE support in HTML,
+what we essentially have in HTTP is GET and POST standing in for safe and unsafe requests,
+respectively.
+</f-note>
+
+<ol start=0>
+  <li>Using HTTP
+  <li>Using resource URIs
+  <li>Using HTTP verbs (methods)
+  <li>Responding with hypermedia
+</ol>
+
+<p>
+The increased salience of HTTP methods to REST is not a perversion of the concept,
+but a practical evolution of it, born from real-world use.
+Aspirational REST adherents have discovered that it is incredibly helpful to have a
+standardized semantic for to describe <em>how</em> the resource is to be modified.
+
+<p>
+For instance, this overview is from the first API tutorial in the latest ASP.NET Core documentation:<f-note>
+<a
+  href="https://learn.microsoft.com/en-us/aspnet/core/tutorials/first-web-api?view=aspnetcore-8.0&tabs=visual-studio">Tutorial:
+  Create a web API with ASP.NET Core</a>; interestingly, this tutorial doesn't even mention REST,
+although it does link to another page describing RESTful APIs.
+</f-note>
+
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>Description</th>
+<th>Request body</th>
+<th>Response body</th>
+</tr>
+</thead>
+
+<tr>
+<td><code>GET /api/todoitems</code></td>
+<td>Get all to-do items</td>
+<td>None</td>
+<td>Array of to-do items</td>
+</tr>
+<tr>
+<td><code>GET /api/todoitems/{id}</code></td>
+<td>Get an item by ID</td>
+<td>None</td>
+<td>To-do item</td>
+</tr>
+<tr>
+<td><code>POST /api/todoitems</code></td>
+<td>Add a new item</td>
+<td>To-do item</td>
+<td>To-do item</td>
+</tr>
+<tr>
+<td><code>PUT /api/todoitems/{id}</code></td>
+<td>Update an existing item &nbsp;</td>
+<td>To-do item</td>
+<td>None</td>
+</tr>
+<tr>
+<td><code>DELETE /api/todoitems/{id}</code> &nbsp; &nbsp;</td>
+<td>Delete an item &nbsp; &nbsp;</td>
+<td>None</td>
+<td>None</td>
+</tr>
+
+</table>
+
+<p>
+This how most developers understand REST: a service is RESTful if it uses methods and URIs to describe what <strong>action</strong> you're taking on what <strong>resource</strong>.
+But if you look closely, you'll notice that it's not REST: the API returns JSON data, not hypermedia. The popular conception of REST is stuck at Level 2 of the Richardson Maturity Model.
+
+<!-- in HTML, Level 2 and Level 3 are mutually exclusive. -->
+
+<p>
+Developers break down their APIs this way, in spite of insufficient HTML support, because it's
+simpler.
+An API that supports <code>PUT /users/123</code> and <code>DELETE /users/123</code> is easier to
+describe than a <code>POST /users/123</code> API that has certain body semantics that alter whether
+it will update or delete the resource described.
+
+<p>
+The usefulness of methods as an HTTP semantic—a priori to the semantics of the methods
+themselves—is so self-evident that the hypertext transfer protocol has long standardized a bunch of
+additional methods; all that remains is for the dominant hypertext markup to support them.
+
+<h3>Ecosystem Demand</h3>
+
+Lacking proper browser support, developers still consider method semantics important enough to their
+API design that they come up with ad-hoc methods to achieve the same result.
+
+<h4>The hidden input hack</h4>
+
+<p>
+The most common way that developers compensate for the lack of proper HTTP method support is to
+include a hidden input that overrides the method. This pattern is so common that it is supported by
+a variety of server-side frameworks.<f-note>
+Citation needed.
+</f-note>
+
+<code>
+<pre class="code">
+&lt;form method="post" action="/users/123"...&gt;
+  &lt;input type="hidden" name="_method" value="put"&gt;
+  ...
+&lt;/form&gt;
+
+&lt;form method="post" action="/users/123"...&gt;
+  &lt;input type="hidden" name="_method" value="delete"&gt;
+  ...
+&lt;/form&gt;
+</pre>
+</code>
+
+<p>
+This would be a Level 1 on the Richardson Maturity Model. The URIs consistently identify a
+resource (<code>user/123</code>), but the method is always POST, so the verbs aren't in use.
+
+<p>
+This pattern has a number of drawbacks that would be rectified by proper PUT, PATCH, and DELETE
+support:<f-note>
+These points are not new; many of them were made by Mike Amundsen in the closed
+<a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c4">WHATWG Bug 10671</a>.
+</f-note>
+
+<ul>
+  <li>Unlike POST, PUT and DELETE are idempotent, which gives the client more leeway to recover
+    from network failures
+  <li>HTTP methods are typically logged while HTTP bodies are not; services that break up their
+    unsafe requests across POST, PUT, and DELETE have a smaller surface to debug than ones where all
+    unsafe request are tunneled through POST.
+  <li>HTTP methods are a powerful filtering tool for debugging across the stack—server logs,
+    application logs, and the browser network tab.
+  <li>Routing is fundamental to server logic, and including an additional variable for routing
+    dramatically simplifies the server logic that would otherwise have to compensate by performing
+    additional routing imperatively.
+</ul>
+
+<h4>Ad-hoc URI semantics</h4>
+
+<p>
+Another workaround is to encode the method semantics straight into the URI.
+<code>
+<pre class="code">
+&lt;form method="post" action="/users/123/put"...&gt;
+  ...
+&lt;/form&gt;
+
+&lt;form method="post" action="/users/123/delete"...&gt;
+  ...
+&lt;/form&gt;
+</pre>
+</code>
+
+
+<p>
+This actually resolves some of the operational issues with the hidden input hack. The different
+actions are visible to the transport layer (although in a slightly harder-to-parse location than the
+proper method field), and server routers can easily declare separate handlers for each action.
+
+<p>
+But it is certainly not REST. In fact, it regresses on the Richardson Maturity Model from even the
+hidden input hack, all the way back down to 0.
+Where the hidden input at least used URIs to identify resources, now the URIs don't even represent
+resources anymore; they represent a combination of resource and method, mixing the
+semantics of both.
+
+<p>
+In addition to minor inconveniences like making it more cumbersome to filter logs,
+the greater impact of this is to unmoor the developer from any kind of consistent semantics.
+The standardized HTTP methods guide the developer to a clear and consistent pattern.
+If the developer is not presented with a consistent set of common verbs for common tasks, they are
+liable to invent their own. Why shouldn't <code>/put</code> be <code>/create</code>, or
+<code>/delete</code> be <code>/remove</code>?<f-note>
+You might reasonably wonder why this is bad, when earlier we discussed how interesting
+opportunities that would be available if methods were entirely arbitrary. The answer is: because
+telling the user agent what the method is lets it pilot new features and be resilient to ones it
+doesn't understand. When extensions like these are tried out in the method slot, the client can
+choose to optimize them if they are recognized—like trusting the idempotence or GET or PUT—or
+fallback to a baseline behavior if they are not. Of course, HTTP <em>already</em> has features that
+differentiate GET, POST, PUT, and DELETE, so the question of whether browsers might build features around those is not theoretical—they already do.
+</f-note>
+
+<p>
+The obvious smell of this pattern, when placed next to the actual HTTP methods, leads developers to
+conclude, correctly, that the missing methods limitation is endogenous to HTML, and the solution is
+to augment or abandon HTML rather than throw out URI semantics along with them.
+
+<!-- <p> -->
+<!-- Lacking PUT and DELETE, hypermedia doesn't support this paradigm, but JavaScript (with the fetch -->
+<!-- API) does. -->
+<!-- So developers -->
+<!-- Without proper method support, -->
+
+
+<h4>REST support in Frameworks</h4>
+
+<div class=notice>Pretty much everything after this is still unfinished</div>
+
+<p>
+Demonstrate the overwhelming PUT/DELETE support in existing server-side
+
+<p>
+Maybe something about the client-side framework support as well
+
+<h3>Software Design on the Scale of Decades</h3>
+
+
+<p>
+If REST is so cumbersome to implement in HTML, what if the fault lies not with HTML, but with REST.
+Perhaps REST served as a useful guideline for the early days of the web, but is no longer up to the
+demands of modern web applications? This is not so.
+
+<p>
+REST outlines a powerful framework for building durable, distributed hypermedia applications on the
+web platform.
+
+<p>
+The inclusion of proper REST facilities in HTML makes REST the easier and simplest thing to do
+
+<p>
+This would cement the web as the dominant infrastructure platform for essential services, were
+reliability and accessibility are prized above all else.
+
+<h2>Additional Benefits</h2>
+Prior variations on this proposal failed to generate the necessary traction to get implemented,
+which burdens the concept with considerable inertia.<f-note>
+Citation needed.
+</f-note>
+
+Additionally, adopting PUT, PATCH, and DELETE form support today would require nontrivial changes to
+browser navigation, a technically complex challenge.
+
+<p>
+Nevertheless, we believe that this this simple (from a UX standpoint) change has transformative
+potential for the web platform, dramatically reducing the compromises required to build web
+applications without scripting. Done properly, the simple addition of three HTTP Methods makes pure
+HTML feasible as an application platform for use-cases where reliability, durability, and security
+are prized.
+
+
+<h3>Simplify Application Servers</h3>
+
+<p>
+Let you use routers better
+
+<p>
+Many server frameworks support it
+
+<h3>Encourage Security Best Practices</h3>
+<p>
+Encourage same-origin (and other security stuff)
+
+<h3>Encourage Semantic HTML For Future Performance Gains</h3>
+<p>
+Encourage HTML writing
+
+<p>
+Lots of perf gains to be had with better HTTP method use
+
+caching?
+
+
+<h2>History</h2>
+
+
+<h2>Alternatives and Optional Proposals</h2>
+<h3>Alternative: Omit PATCH</h3>
+<p>
+PUT and DELETE are necessary to include a full REST grammar in HTML; PATCH is not.
+
+<h3>Optional: Allow Cross-Origin Requests with CORS</h3>
+
+<h3>Optional: DELETE request bodies</h3>
+<p>
+There's no inherent reason why a DELETE request couldn't send body content, and many popular
+frameworks, like ExpressJS, do support it. Nor is DELETE content expressly prohibited by the spec,
+which allows for such requests if the origin server has indicated that it supports them.
+Since most HTML forms are same-origin, it could sense to allow the form to indicate that it would be
+fine with DELETE content,
+
+<p>
+A <code>usebody</code> attribute could be included to indicate support. If present, the form
+would send its data as part of the body, for DELETE (or GET) requests; it would be ignored for all
+other methods.
+
+
+
+<!-- Within this framework, we can understand HTTP methods as part of the manipulation semantics; they -->
+<!-- signify how the enclosed representation is to be processed. -->
+
+<section class=footnotes>
+<h2>Footnotes</h2>
+</section>
+
+
+<script>
+class Footnote extends HTMLElement {
+  static numFootnotes = 0
+
+  connectedCallback() {
+    Footnote.numFootnotes += 1
+
+    this.content = this.innerHTML
+    this.num = Footnote.numFootnotes
+    this.innerHTML = `<sup id="fn-${this.num}"><a href="#ref-${this.num}">[${this.num}]</a></sup>`
+  }
+}
+
+customElements.define('f-note', Footnote)
+
+// Create footnotes
+const footnotesSection = document.querySelector('section.footnotes')
+const footnotes = document.querySelectorAll('f-note')
+for (footnote of footnotes) {
+  const p = document.createElement('p')
+  p.classList.add('footnote')
+  p.id = `ref-${footnote.num}`
+  p.innerHTML = `[${footnote.num}] ${footnote.content} <a href="#fn-${footnote.num}">↩</a>`
+  footnotesSection.append(p)
+}
+
+// Create table of contents
+const toc = document.querySelector('details.toc')
+const headings = document.querySelectorAll('h2,h3')
+const topList = document.createElement('ol')
+let currentH2
+for (heading of headings) {
+  heading.id = heading.innerText.replace(' ', '-')
+  if (heading.tagName === 'H2') {
+    currentH2 = document.createElement('li')
+    currentH2.innerHTML = `<a href="#${heading.id}">${heading.innerText}</a><ol></ol>`
+    topList.append(currentH2)
+  } else {
+    const h2Sublist = currentH2.querySelector('ol')
+    const h3Item = document.createElement('li')
+    h3Item.innerHTML = `<a href="#${heading.id}">${heading.innerText}</a><ol></ol>`
+    h2Sublist.append(h3Item)
+  }
+}
+toc.append(topList)
+
+</script>
+
+<!-- https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.4-10 -->
