@@ -60,7 +60,8 @@ Existing form controls (e.g. <code>action</code>, <code>enctype</code>) should o
 <h2 id=sample-usage>Sample Usage in Resource Lifecycle</h2>
 
 This section demonstrates how PUT and DELETE methods are necessary for managing the lifecycle of a
-resource. We use as an example a hypothetical hotel reservation service, in which users have the
+resource.
+We use as an example a hypothetical hotel reservation service, in which users have the
 ability to book hotel rooms.
 
 <p>
@@ -72,8 +73,8 @@ All examples in this section assume that the host origin is https://example.com.
 First, the user makes a reservation using a traditional POST form:<f-note>While PUT is capable of
 creating new resources, POST is preferred when the service
 <q><a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.4-10">selects a proper URI on
-behalf of the client.</a></q> This is the simplest RESTful pattern, and has the additional
-benefit of using a non-idempotent method, so the browser can guard against double reservations.
+behalf of the client.</a></q>
+This is the simplest RESTful pattern, and has the additional benefit of using a non-idempotent method, so the browser can guard against double reservations.
 More benefits to using this pattern will be discussed in the justifications section.
 </f-note>
 </p>
@@ -180,22 +181,20 @@ And the server could choose to either send a delete confirmation page, or redire
 <h3>Navigation</h3>
 <h4>Rendering</h4>
 If the response status code is not a redirection code (300-399), the browser should display the body
-of the response in the page, exactly the same way it would for the response of a POST form. It
-should likewise update the page URL and history.
+of the response in the page, exactly the same way it would for the response of a POST form.
+It should likewise update the page URL and history.
 
 <h4>Redirection</h4>
 <p>
-For PUT, PATCH, and DELETE requests, if the server responds with a 301, 302, or 307 status code, the
-browser should perform a subsequent request with the same HTTP method; if the server responds with a
-303 status code, the browser should perform a subsequent request as a GET request.
+For PUT, PATCH, and DELETE requests, if the server responds with a 301, 302, or 307 status code, the browser should perform a subsequent request with the same HTTP method;
+if the server responds with a 303 status code, the browser should perform a subsequent request as a GET request.
 
 <p>
 When browsers receive a 302 response to a POST form, they typically follow that redirect
-automatically and change the method to GET; there is no need for this behavior to apply to PUT,
-PATCH, and DELETE. Changing POST to GET in this fashion is a backwards compatibility carveout in the
-spec, which has not been applied to other methods in browsers' fetch implementations. Using a 303
-instead of a 302 is already a well-understood pattern for server frameworks that support
-these methods, so no additional carveouts are needed to integrate with them.<f-note>
+automatically and change the method to GET;
+there is no need for this behavior to apply to PUT, PATCH, and DELETE.
+Changing POST to GET in this fashion is a backwards compatibility carveout in the spec, which has not been applied to other methods in browsers' fetch implementations.
+Using a 303 instead of a 302 is already a well-understood pattern for server frameworks that support these methods, so no additional carveouts are needed to integrate with them.<f-note>
 For instance, <a
   href="https://stackoverflow.com/questions/33214717/why-post-redirects-to-get-and-put-redirects-to-put">ExpressJS</a>
 and <a href="https://stackoverflow.com/questions/71975005/rails-not-redirecting-on-put-request-sending-406-back-instead">Rails</a>.
@@ -213,11 +212,13 @@ redirect So it would be good to clarify that PUT and DELETE, when being redirect
 *not* be rewritten to GET.</q>
 </f-note>
 
-<h4>Refresh Behavior</h4>
+<h4>Refresh Button</h4>
 <p>
-Need to make a decision here about whether to re-submit idempotent requests, or switch to GET. I am
-softly in favor of the former.
+For PATCH requests, which are not idempotent, the user agent should behave as it does currently, asking the user for confirmation and warning that it may cause the data to be re-submitted.
 
+<p>
+For PUT and DELETE requests, which are idempotent, the user agent should resubmit the request.
+This allows servers to take advantage of the method semantics and create forms that users on un-reliable connections can feel confident re-submitting.
 
 <h3 id=body-content>Body Content</h3>
 
@@ -405,10 +406,8 @@ respectively.
 </ol>
 
 <p>
-The increased salience of HTTP methods to REST is not a perversion of the concept,
-but a practical evolution of it, born from real-world use.
-Aspirational REST adherents have discovered that it is incredibly helpful to have a
-standardized semantic for to describe <em>how</em> the resource is to be modified.
+The increased salience of HTTP methods to REST is not a perversion of the concept, but a practical evolution of it, born from real-world use.
+Aspirational REST adherents have discovered that it is incredibly helpful to have a standardized semantic for to describe <em>how</em> the enclosed resource is to be modified.
 
 <p>
 For instance, this overview is from the first API tutorial in the latest ASP.NET Core documentation:<f-note>
@@ -475,7 +474,7 @@ describe than a <code>POST /users/123</code> API that has certain body semantics
 it will update or delete the resource described.
 
 <p>
-The usefulness of methods as an HTTP semantic—a priori to the semantics of the methods
+The usefulness of methods as an HTTP semantic—<i>a priori</i> to the semantics of the methods
 themselves—is so self-evident that the hypertext transfer protocol has long standardized a bunch of
 additional methods; all that remains is for the dominant hypertext markup to support them.
 
