@@ -151,7 +151,12 @@ The server can then choose to either send back a new page or redirect to one.
 
 <h3 id=basic-delete-form>Deleting A Resource</h3>
 
-The second form on the reservation page allows the user to delete their reservation:
+The second form on the reservation page allows the user to delete their reservation:<f-note>
+In Bugzilla Issue #10671, <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c16">Ian Hickson wrote</a>: <q>PUT as a form method makes no sense, you wouldn't want to PUT a form payload. DELETE only makes sense if there is no payload, so it doesn't make much sense with forms either.</q>.
+<br>
+While we disagree with this comment for the many of the same reasons that <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c18">Cameron Jones</a> and <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c21">Tom Wardrop</a> did originally, there is one limited sense in which Hickson's comment is correct: it doesn't make much sense to wrap a button in a form tag to issue a payload-less DELETE request.
+We address this limitation in <a href="#">Triptych Proposal #2: Button HTTP Requests</a>.
+</f-note>
 
 
 <pre class=code>
@@ -198,8 +203,9 @@ and <a href="https://stackoverflow.com/questions/71975005/rails-not-redirecting-
 
 <p>
 This resolves a blocker for the original Firefox beta implementation.<f-note>
+On 01/12/2011, at 9:57 PM,
 <a href="https://lists.w3.org/Archives/Public/public-html-comments/2011Apr/0000.html">
-On 01/12/2011, at 9:57 PM, Julian Reschke wrote:</a>
+Julian Reschke wrote:</a>
 <q>One thing I forgot earlier, and which was the reason why I actually wanted PUT and DELETE
 temporarily (!) on hold is redirect handling. The experimental Firefox implementation was copying
 the redirect handling for POST (with respect to method rewriting), and it would have been bad to let
@@ -460,14 +466,10 @@ although it does link to another page describing RESTful APIs.
 This how most developers understand REST: a service is RESTful if it uses methods and URIs to describe what <strong>action</strong> you're taking on what <strong>resource</strong>.
 But if you look closely, you'll notice that it's not REST: the API returns JSON data, not hypermedia. The popular conception of REST is stuck at Level 2 of the Richardson Maturity Model.
 
-<!-- in HTML, Level 2 and Level 3 are mutually exclusive. -->
-
 <p>
-Developers break down their APIs this way, in spite of insufficient HTML support, because it's
-simpler.
+Developers choose to build APIs with the standardized method grammar—in spite of missing HTML support—because it's simpler.
 An API that supports <code>PUT /users/123</code> and <code>DELETE /users/123</code> is easier to
-describe than a <code>POST /users/123</code> API that has certain body semantics that alter whether
-it will update or delete the resource described.
+describe and code than a <code>POST /users/123</code> API whose body semantics alter how it processes the enclosed resource.
 
 <p>
 The usefulness of methods as an HTTP semantic—<i>a priori</i> to the semantics of the methods
@@ -557,7 +559,7 @@ semantics of both.
 
 <p>
 In addition to minor inconveniences like making it more cumbersome to filter logs,
-the greater impact of this is to unmoor the developer from any kind of consistent semantics.
+the greater impact of this is to unmoor the application from any universal semantics.
 The standardized HTTP methods guide the developer to a clear and consistent pattern.
 If the developer is not presented with a consistent set of common verbs for common tasks, they are
 liable to invent their own. Why shouldn't <code>/put</code> be <code>/create</code>, or
