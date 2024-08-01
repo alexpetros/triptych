@@ -107,6 +107,7 @@ p.footnote:target {
 }
 
 table {
+  margin: 0 auto;
   border-collapse: collapse;
 }
 
