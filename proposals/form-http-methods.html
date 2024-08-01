@@ -587,6 +587,156 @@ to augment or abandon HTML rather than throw out URI semantics along with them.
 
 <h4>REST support in Frameworks</h4>
 
+<p>
+Support for all HTTP methods is widespread in server side frameworks.  Currently, this support is
+mainly used for JSON-based APIs, since JavaScript-based network interactions via technologies like
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XmlHttpRequest</a> (xhr)
+or <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API"><code>fetch()</code></a> allow
+JavaScript developers to access these HTTP methods.
+
+
+<p>
+Below is a table of some major server side frameworks in various programming langauges, and their support
+for HTTP methods.
+
+<table>
+<thead>
+<tr>
+  <th>Language</th>
+  <th>Framework</th>
+  <th>HTTP Method Support</th>
+</tr>
+</thead>
+<tr>
+  <td rowspan="3">JavaScript</td>
+  <td>
+    <a href="https://expressjs.com">
+      Express
+    </a>
+    </a>
+  </td>
+  <td>
+    <a href="https://expressjs.com/en/4x/api.html#app">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="https://nextjs.org">
+      Next.js
+    </a>
+  </td>
+  <td>
+    <a href="https://nextjs.org/docs/app/building-your-application/routing/route-handlers#supported-http-methods">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="https://astro.build">
+      Astro
+    </a>
+  </td>
+  <td>
+    <a href="https://docs.astro.build/en/guides/endpoints/#http-methods">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td rowspan="2">Python</td>
+  <td>
+    <a href="https://flask.palletsprojects.com/en/3.0.x/">
+      Flask
+    </a>
+  </td>
+  <td>
+    <a href="https://flask.palletsprojects.com/en/3.0.x/quickstart/#routing">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="https://www.djangoproject.com/">
+      Django
+    </a>
+  </td>
+  <td>
+    <a href="https://docs.djangoproject.com/en/5.0/topics/http/urls/">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>.NET</td>
+  <td>
+    <a href="https://dotnet.microsoft.com/en-us/apps/aspnet">
+      ASP.NET
+    </a>
+  </td>
+  <td>
+    <a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-8.0">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td rowspan="2">Java</td>
+  <td>
+    <a href="https://spring.io/guides/gs/spring-boot">
+      Spring Boot
+    </a>
+  </td>
+  <td>
+    <a href="https://spring.io/guides/tutorials/rest">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="https://javalin.io/">
+      Javalin
+    </a>
+  </td>
+  <td>
+    <a href="https://javalin.io/documentation#handlers">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>Go</td>
+  <td>
+    <a href="https://pkg.go.dev/net/http">
+      Core HTTP Library
+    </a>
+  </td>
+  <td>
+    <a href="https://pkg.go.dev/net/http#pkg-constants">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>PHP</td>
+  <td>
+    <a href="https://laravel.com/">
+      Laravel
+    </a>
+  </td>
+  <td>
+    <a href="https://laravel.com/docs/11.x/routing#available-router-methods">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+</table>
+
+
 <div class=notice>Pretty much everything after this is still unfinished</div>
 
 <p>
