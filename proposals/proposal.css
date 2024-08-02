@@ -167,3 +167,16 @@ div.notice {
   background-color: var(--notice-color);
   padding: 1rem;
 }
+
+cite.article {
+  font-style: normal;
+}
+
+cite.article::before {
+  content: "\201C";
+}
+
+cite.article::after {
+  content: "\201D";
+}
+

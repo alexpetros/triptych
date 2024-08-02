@@ -352,12 +352,21 @@ supposed to be described in the same context in which you found the URI that you
 That GET, POST, and PUT have a semantic meaning outside the context of the application (GET is
 safe, POST is not, and so on) is a secondary concern; the primary obligation of the client is to
 allow the hypermedia API to describe itself, and then faithfully execute that description.<f-note>
-Since REST was designed to describe an infrastructure in which some HTTP methods already had semantic meaning, it's unlikely that Fielding would suggest we throw out that meaning
-  In a different comment on the same blog, Fielding refers to a GET request as a <a
-  href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-730">"retrieval
-  request"</a>, which suggests a willingness to include agreed-upon method semantics within the
-confines of a "self-describing" API.
+Fielding's comments on method usage are somewhat contradictory.
+In <cite class=article><a href="https://roy.gbiv.com/untangled/2009/it-is-okay-to-use-post">It is okay to use POST</a></cite>, he seems broadly committed to the principle that the server gets to define what the methods mean, reminding readers that specific <q>method definitions (aside from the retrieval:resource duality of GET) simply don’t matter to the REST architectural style</q>.
+He also asks: <q>why shouldn't you use POST to perform an update? Hypertext can tell the client which method to use when the action being taken is unsafe.</q>
+
+<br><br>
+
+But in the next paragraph, he says that POST is an issue <q>when it is used in a situation some other method is ideally suited,</q> including <q>complete replacement of a representation (PUT)</q>.
+So it's fine to use POST to update a resource, unless your update is a complete representation of that resource, in which case it's not?
+Is it fine to use POST method to delete a resource, a task for which DELETE is ideally suited?
+
+<br><br>
+The most reasonable way to interpret Fielding's statements here (and the statements referenced in the following footnote) is that REST is primarily concerned with defending the distributed system's ability to write self-describing messages, but deliberately unconcerned with how it does so, as long as it does not violate any of the already-established out-of-band agreements enshrined within the protocols themselves.
+This allows for some necessary compromises to the theoretical purity of self-description—like the user-agent assuming that GET requests are safe—while still allowing for method extension and graceful fallback.
 </f-note>
+
 The HTML form element's transformation of any non-GET, non-POST method into a GET violates this principle.<f-note>
 n.b. Fielding's <a
 href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be
@@ -415,7 +424,7 @@ respectively.
 
 <p>
 The increased salience of HTTP methods to REST is not a perversion of the concept, but a practical evolution of it, born from real-world use.
-Aspirational REST adherents have discovered that it is incredibly helpful to have a standardized semantic for to describe <em>how</em> the enclosed resource is to be modified.
+Aspirational REST adherents have discovered that it is much easier to uphold a consistent representation of a resource (via URIs) when you have a standardized semantic for to describe <em>how</em> the enclosed resource is to be modified.
 
 <p>
 For instance, this overview is from the first API tutorial in the latest ASP.NET Core documentation:<f-note>
@@ -482,12 +491,73 @@ The usefulness of methods as an HTTP semantic—<i>a priori</i> to the semantics
 themselves—is so self-evident that the hypertext transfer protocol has long standardized a bunch of
 additional methods; all that remains is for the dominant hypertext markup to support them.
 
-<h3>Ecosystem Demand</h3>
+<h3>REST and its hypermedia representation</h3>
+<p>
+We know that REST APIs must return hypertext, but we propose two additional constraints on the hypermedia and the user-agent that renders it:
+
+<ol>
+  <li>
+    The hypermedia representation must be backwards-comaptible;
+    user-agents that support it must old markup faithfully.
+  <li>
+    The hypermedia representation must be forwards-compatible;
+    user-agents that support it must degrade gracefully in response to new markup.
+</ol>
+
+We propose that for REST to succeed in its design, the hypermedia representation must have two qualities: it must be sufficient to
+
+<f-note>
+Although hypermedia representations are a core tenet of REST, relatively little is said in the thesis about the necessary qualities of that hypermedia representation. Chapter 6 contains sections on <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_2">"Rest Applied to URI"</a> and <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_3">"REST Applied to HTTP"</a> but not "REST Applied to HTML."
+</f-note>
+
+
+<h3>Software Design on the Scale of Decades</h3>
+<p>
+If REST is so cumbersome to implement in HTML, what if the fault lies not with HTML, but with REST.
+Perhaps REST served as a useful guideline for the early days of the web, but is no longer up to the
+demands of modern web applications? This is not so.
+
+<p>
+Fielding writes:
+
+<blockquote>
+REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution.
+Many of the constraints are directly opposed to short-term efficiency. [...]
+There are more than a few software methodologies that portray any long-term thinking as wrong-headed, ivory tower design (which it can be if it isn't motivated by real requirements).<f-note>
+<a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-724">"Rest APIs Must be Hypertext Driven"</a>, Comment #8
+</f-note>
+</blockquote>
+
+<p>
+REST was designed to build software systems that last for decades, and it is against that benchmark that REST should be evaluated.
+The Web itself has lasted for decades, but the Web is only useful insofar as it comprises useful services;
+does REST succeed at helping web <em>developers</em> to build services that last as long as the web does?
+
+an enormous amount of that durability is guaranteed not by the idea of REST, but by the implementation of HTML.
+
+
+<!-- One of these software systems is the World Wide Web itself, which REST was designed to describe and direct. Despite fierce competition from desktop and mobile applications, the web remains arguably the dominant platform for application development today. But -->
+
+<p>
+REST outlines a powerful framework for building durable, distributed hypermedia applications on the
+web platform, but
+
+<p>
+The fact that REST has developed—in the 24 years since Fielding's dissertation—in a manner that emphasizes the HTTP method, while HTML still does not properly support said method, is not evidence that REST, HTTP, and HTML are stale paradigms—it is evidence that they are durable, growing paradigms that evolve very slowly. This is their chief advantage over every other manner of writing software.
+
+<p>
+The inclusion of proper REST facilities in HTML makes REST the easier and simplest thing to do
+
+<p>
+This would cement the web as the dominant infrastructure platform for essential services, were
+reliability and accessibility are prized above all else.
+
+<h2>Ecosystem Demand</h2>
 
 Lacking proper browser support, developers still consider method semantics important enough to their
 API design that they come up with ad-hoc methods to achieve the same result.
 
-<h4>The hidden input hack</h4>
+<h3>The hidden input hack</h3>
 
 <p>
 The most common way that developers compensate for the lack of proper HTTP method support is to
@@ -533,7 +603,7 @@ These points are not new; many of them were made by Mike Amundsen in the closed
     additional routing imperatively.
 </ul>
 
-<h4>Ad-hoc URI semantics</h4>
+<h3>Ad-hoc URI semantics</h3>
 
 <p>
 Another workaround is to encode the method semantics straight into the URI.
@@ -591,7 +661,7 @@ to augment or abandon HTML rather than throw out URI semantics along with them.
 <!-- Without proper method support, -->
 
 
-<h4>REST support in Server Frameworks</h4>
+<h3>REST support in Server Frameworks</h3>
 
 <p>
 Support for all HTTP methods is widespread in server side frameworks.  Currently, this support is
@@ -742,7 +812,7 @@ for HTTP methods.
 </tr>
 </table>
 
-<h4>REST support in client libraries</h4>
+<h3>REST support in client libraries</h3>
 
 <p>
 Support for all HTTP methods is also widespread in client side frameworks.  Interestingly, this support is
@@ -824,7 +894,7 @@ the various HTTP.
   </tbody>
 </table>
 
-<h4>Usage of Non-GET & Non-POST Methods</h4>
+<h3>Usage of Non-GET & Non-POST Methods</h3>
 
 <p>
 While the above table establishes the general support for the full gamut of HTTP methods, it does not establish the
@@ -929,48 +999,6 @@ delete that reservation.
 <p>
 With the addition of the <code>DELETE</code> method, web developers can follow the natural, resource-oriented URL
 pattern.
-
-<h3>Software Design on the Scale of Decades</h3>
-<p>
-If REST is so cumbersome to implement in HTML, what if the fault lies not with HTML, but with REST.
-Perhaps REST served as a useful guideline for the early days of the web, but is no longer up to the
-demands of modern web applications? This is not so.
-
-<p>
-Fielding writes:
-
-<blockquote>
-REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution.
-Many of the constraints are directly opposed to short-term efficiency. [...]
-There are more than a few software methodologies that portray any long-term thinking as wrong-headed, ivory tower design (which it can be if it isn't motivated by real requirements).<f-note>
-<a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-724">"Rest APIs Must be Hypertext Driven"</a>, Comment #8
-</f-note>
-</blockquote>
-
-<p>
-REST was designed to build software systems that last for decades, and it is against that benchmark that it should be evaluated.
-The Web itself has lasted for decades, but the Web is only useful insofar as it comprises useful services;
-does REST succeed at helping web <em>developers</em> to build services that last as long as the web does?
-
-<p>
-an enormous amount of that durability is guaranteed not by the idea of REST, but by the implementation of HTML.
-
-
-<!-- One of these software systems is the World Wide Web itself, which REST was designed to describe and direct. Despite fierce competition from desktop and mobile applications, the web remains arguably the dominant platform for application development today. But -->
-
-<p>
-REST outlines a powerful framework for building durable, distributed hypermedia applications on the
-web platform, but
-
-<p>
-The fact that REST has developed—in the 24 years since Fielding's dissertation—in a manner that emphasizes the HTTP method, while HTML still does not properly support said method, is not evidence that REST, HTTP, and HTML are stale paradigms—it is evidence that they are durable, growing paradigms that evolve very slowly. This is their chief advantage over every other manner of writing software.
-
-<p>
-The inclusion of proper REST facilities in HTML makes REST the easier and simplest thing to do
-
-<p>
-This would cement the web as the dominant infrastructure platform for essential services, were
-reliability and accessibility are prized above all else.
 
 <h2>Additional Benefits</h2>
 <div class=notice>Pretty much everything after this is still unfinished</div>
