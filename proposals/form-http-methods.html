@@ -588,15 +588,19 @@ to augment or abandon HTML rather than throw out URI semantics along with them.
 <!-- Without proper method support, -->
 
 
-<h4>REST support in server frameworks</h4>
+<h4>REST support in Server Frameworks</h4>
 
 <p>
-Support for all HTTP methods is widespread in server-side frameworks.
-Currently, this support is mainly used for JSON-based APIs, since JavaScript-based network interactions via technologies like <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XmlHttpRequest</a>(xhr)</code>
-or <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">fetch()</a></code> allow JavaScript developers to access these HTTP methods.
+Support for all HTTP methods is widespread in server side frameworks.  Currently, this support is
+mainly used for JSON-based APIs, since JavaScript-based network interactions via technologies like
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XmlHttpRequest</a> (xhr)
+or <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API"><code>fetch()</code></a> allow
+JavaScript developers to access these HTTP methods.
+
 
 <p>
-Below is a table of some major server side frameworks in various programming languages, and their support for HTTP methods:
+Below is a table of some major server side frameworks in various programming langauges, and their support
+for HTTP methods.
 
 <table>
 <thead>
@@ -611,6 +615,7 @@ Below is a table of some major server side frameworks in various programming lan
   <td>
     <a href="https://expressjs.com">
       Express
+    </a>
     </a>
   </td>
   <td>
@@ -734,8 +739,193 @@ Below is a table of some major server side frameworks in various programming lan
 </tr>
 </table>
 
-
 <h4>REST support in client libraries</h4>
+
+<p>
+Support for all HTTP methods is also widespread in client side frameworks.  Interestingly, this support is
+increasingly used for HTML-based APIs, in additional to JSON-based APIs, indicating that there is demand
+for a full implementation of HTTP methods in HTML.
+
+<p>
+Below is a table of client side frameworks that use HTML as a network format, as well as their support for
+the various HTTP.
+
+<table>
+  <thead>
+  <tr>
+    <th>Framework</th>
+    <th>HTTP Method Support</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>
+      <a href="https://htmx.org">
+        htmx
+      </a>
+    </td>
+    <td>
+      <a href="https://htmx.org/docs/#ajax">
+        All HTTP Methods
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="https://unpoly.com/">
+        Unpoly
+      </a>
+    </td>
+    <td>
+      <a href="https://unpoly.com/up.request#options.method">
+        All HTTP Methods
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="https://alpine-ajax.js.org/">
+        Alpine-Ajax
+      </a>
+    </td>
+    <td>
+      <a href="https://alpine-ajax.js.org/examples/delete-row/">
+        All HTTP Methods
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="https://github.com/defunkt/jquery-pjax/">
+        pjax
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/defunkt/jquery-pjax?tab=readme-ov-file#pjax-options">
+        All HTTP Methods
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="https://turbo.hotwired.dev/">
+        Hotwire Turbo
+      </a>
+    </td>
+    <td>
+      <a href="https://discuss.hotwired.dev/t/destroy-record-in-turbo-frame/2731">
+        All HTTP Methods
+      </a>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<h4>Usage of Non-GET & Non-POST Methods</h4>
+
+<p>
+While the above table establishes the general support for the full gamut of HTTP methods, it does not establish the
+usefulness of them for web developers.  In order to get a feel for that, we can search Github for use of the following
+htmx attributes: <code>hx-put</code>, <code>hx-patch</code> &amp; <code>hx-delete</code>
+
+<p>
+Below is a table of the results of these searches:
+
+<table>
+  <thead>
+  <tr>
+    <th>Attribute</th>
+    <th>Count</th>
+    <th>% of <code>hx-get</code></th>
+    <th>% of <code>hx-post</code></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>
+      <code>hx-get</code>
+    </td>
+    <td>
+      35.2k
+    </td>
+    <td>
+      100%
+    </td>
+    <td>
+      -
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>hx-post</code>
+    </td>
+    <td>
+      22.5k
+    </td>
+    <td>
+      64%
+    </td>
+    <td>
+      100%
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>hx-put</code>
+    </td>
+    <td>
+      3.8k
+    </td>
+    <td>
+      11%
+    </td>
+    <td>
+      17%
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>hx-patch</code>
+    </td>
+    <td>
+      1.2k
+    </td>
+    <td>
+      3%
+    </td>
+    <td>
+      5%
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <code>hx-delete</code>
+    </td>
+    <td>
+      6.5k
+    </td>
+    <td>
+      18%
+    </td>
+    <td>
+      29%
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<p>
+You can see that there is widespread use of the three additional methods in htmx-based applications, particularly
+<code>hx-put</code> and <code>hx-delete</code>.  It is worth noting the popularity of the <code>DELETE</code> method
+in HTML-based web applications.  This is because it allows web developers to issue two different methods to the same
+URL. A  web developer can use <code>POST</code> to <code>/reservations/</code> to create a new reservation and
+a <code>POST</code> to <code>/reservations/123</code> to update an existing reservation (even if they would prefer to
+issue a <code>PUT</code> or <code>PATCH</code>) but must create a separate end-point (or use another workaround) to
+delete that reservation.
+
+<p>
+With the addition of the <code>DELETE</code> method, web developers can follow the natural, resource-oriented URL
+pattern.
 
 <h3>Software Design on the Scale of Decades</h3>
 <p>
@@ -790,7 +980,7 @@ Additionally, adopting PUT, PATCH, and DELETE form support today would require n
 browser navigation, a technically complex challenge.
 
 <p>
-Nevertheless, we believe that this this simple (from a UX standpoint) change has transformative
+Nevertheless, we believe that this simple (from a UX standpoint) change has transformative
 potential for the web platform, dramatically reducing the compromises required to build web
 applications without scripting. Done properly, the simple addition of three HTTP Methods makes pure
 HTML feasible as an application platform for use-cases where reliability, durability, and security
