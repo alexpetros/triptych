@@ -5,6 +5,8 @@
   --link-color: blue;
   --code-background: lightgray;
   --notice-color: bisque;
+  --blockquote-background: #f9f9f9;
+  --blockquote-accent: #ccc;
 
   color: var(--text-color);
   background-color: var(--page-background);
@@ -19,6 +21,8 @@
     --header-color: white;
     --code-background: rgb(60, 60, 60);
     --notice-color: maroon;
+    --blockquote-background: black;
+    --blockquote-accent: darkgray;
   }
 }
 
@@ -139,6 +143,24 @@ th {
 
 th, td {
   padding: 5px 10px;
+}
+
+
+blockquote {
+  background: var(--blockquote-background);
+  border-left: 5px solid var(--blockquote-accent);
+  color: var(--text-color);
+  margin: 1.5em 10px;
+  padding: 1em 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+}
+
+blockquote:before {
+  color: var(--blockquote-accent);
+  font-size: 4em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.4em;
 }
 
 div.notice {
