@@ -1,14 +1,28 @@
 :root {
   --page-background: white;
+  --text-color: black;
   --header-color: #039;
-}
+  --link-color: blue;
+  --code-background: lightgray;
+  --notice-color: bisque;
 
-html {
+  color: var(--text-color);
+  background-color: var(--page-background);
   scrollbar-gutter: stable;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-color: #fff;
+    --page-background: black;
+    --link-color: lightblue;
+    --header-color: white;
+    --code-background: rgb(60, 60, 60);
+    --notice-color: maroon;
+  }
+}
+
 body {
-  background-color: var(--page-background);
   font-family: Verdana;
   margin: 20px auto;
   max-width: 900px;
@@ -54,8 +68,12 @@ dt {
   font-weight: bold;
 }
 
+a {
+  color: var(--link-color);
+}
+
 a:visited {
-  color: blue;
+  color: var(--link-color);
 }
 
 details {
@@ -77,7 +95,7 @@ summary {
 }
 
 summary:hover {
-  background-color: lightgray;
+  background-color: var(--code-background);
 }
 
 .toc ol {
@@ -93,7 +111,7 @@ summary:hover {
 pre.code {
   font-family: Monospace;
   overflow: auto;
-  background-color: lightgray;
+  background-color: var(--code-background);
   padding: 10px;
 }
 
@@ -107,11 +125,12 @@ p.footnote:target {
 }
 
 table {
+  margin: 0 auto;
   border-collapse: collapse;
 }
 
 tr {
-  border: 1px solid black;
+  border: 1px solid var(--text-color);
 }
 
 th {
@@ -123,6 +142,6 @@ th, td {
 }
 
 div.notice {
-  background-color: bisque;
+  background-color: var(--notice-color);
   padding: 1rem;
 }

@@ -259,7 +259,9 @@ ecosystem, which generally understands the similar language in the GET and DELET
 discouragement of body content for both.
 </f-note>
 Therefore, forms with <code>method=DELETE</code> should encode their inputs as part the URI,
-emulating the behavior of forms with no <code>method</code>, or <code>method=GET</code>.
+emulating the behavior of forms with no <code>method</code>, or <code>method=GET</code>.<f-note>
+While many server frameworks are agnostic to the relationship between HTTP methods and the body of the HTTP request, one notable exception is the golang standard library's <a href="https://pkg.go.dev/net/http#Request.ParseForm">ParseForm</a> function, which reads POST, PUT, and PATCH requests as urlencoded forms, but ignores the body if the request has any other method.
+</f-note>
 
 <h3>Caching</h3>
 <p>
@@ -284,6 +286,7 @@ PUT and DELETE responses are never cacheable.<f-note>
 
 
 <h3>CORS</h3>
+<div class=notice>More detail needed here</div>
 <p>
 To start, browsers should prohibit cross-origin requests with the new methods.
 
@@ -490,7 +493,6 @@ a variety of server-side frameworks.<f-note>
 Citation needed.
 </f-note>
 
-<code>
 <pre class="code">
 &lt;form method="post" action="/users/123"...&gt;
   &lt;input type="hidden" name="_method" value="put"&gt;
@@ -502,7 +504,7 @@ Citation needed.
   ...
 &lt;/form&gt;
 </pre>
-</code>
+
 
 <p>
 This would be a Level 1 on the Richardson Maturity Model. The URIs consistently identify a
@@ -532,7 +534,8 @@ These points are not new; many of them were made by Mike Amundsen in the closed
 
 <p>
 Another workaround is to encode the method semantics straight into the URI.
-<code>
+</p>
+
 <pre class="code">
 &lt;form method="post" action="/users/123/put"...&gt;
   ...
@@ -542,7 +545,7 @@ Another workaround is to encode the method semantics straight into the URI.
   ...
 &lt;/form&gt;
 </pre>
-</code>
+
 
 
 <p>
@@ -740,22 +743,185 @@ for HTTP methods.
 <div class=notice>Pretty much everything after this is still unfinished</div>
 
 <p>
-Demonstrate the overwhelming PUT/DELETE support in existing server-side
+Support for all HTTP methods is widespread in server-side frameworks.
+Currently, this support is mainly used for JSON-based APIs, since JavaScript-based network interactions via technologies like <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest">XmlHttpRequest</a>(xhr)</code>
+or <code><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">fetch()</a></code> allow JavaScript developers to access these HTTP methods.
 
 <p>
-Maybe something about the client-side framework support as well
+Below is a table of some major server side frameworks in various programming languages, and their support for HTTP methods:
+
+<table>
+<thead>
+<tr>
+  <th>Language</th>
+  <th>Framework</th>
+  <th>HTTP Method Support</th>
+</tr>
+</thead>
+<tr>
+  <td rowspan="3">JavaScript</td>
+  <td>
+    <a href="https://expressjs.com">
+      Express
+    </a>
+  </td>
+  <td>
+    <a href="https://expressjs.com/en/4x/api.html#app">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="https://nextjs.org">
+      Next.js
+    </a>
+  </td>
+  <td>
+    <a href="https://nextjs.org/docs/app/building-your-application/routing/route-handlers#supported-http-methods">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="https://astro.build">
+      Astro
+    </a>
+  </td>
+  <td>
+    <a href="https://docs.astro.build/en/guides/endpoints/#http-methods">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td rowspan="2">Python</td>
+  <td>
+    <a href="https://flask.palletsprojects.com/en/3.0.x/">
+      Flask
+    </a>
+  </td>
+  <td>
+    <a href="https://flask.palletsprojects.com/en/3.0.x/quickstart/#routing">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="https://www.djangoproject.com/">
+      Django
+    </a>
+  </td>
+  <td>
+    <a href="https://docs.djangoproject.com/en/5.0/topics/http/urls/">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>.NET</td>
+  <td>
+    <a href="https://dotnet.microsoft.com/en-us/apps/aspnet">
+      ASP.NET
+    </a>
+  </td>
+  <td>
+    <a href="https://learn.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-8.0">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td rowspan="2">Java</td>
+  <td>
+    <a href="https://spring.io/guides/gs/spring-boot">
+      Spring Boot
+    </a>
+  </td>
+  <td>
+    <a href="https://spring.io/guides/tutorials/rest">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>
+    <a href="https://javalin.io/">
+      Javalin
+    </a>
+  </td>
+  <td>
+    <a href="https://javalin.io/documentation#handlers">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>Go</td>
+  <td>
+    <a href="https://pkg.go.dev/net/http">
+      Core HTTP Library
+    </a>
+  </td>
+  <td>
+    <a href="https://pkg.go.dev/net/http#pkg-constants">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+<tr>
+  <td>PHP</td>
+  <td>
+    <a href="https://laravel.com/">
+      Laravel
+    </a>
+  </td>
+  <td>
+    <a href="https://laravel.com/docs/11.x/routing#available-router-methods">
+      All HTTP Methods
+    </a>
+  </td>
+</tr>
+</table>
+
+
+<h4>REST support in client libraries</h4>
 
 <h3>Software Design on the Scale of Decades</h3>
-
-
 <p>
 If REST is so cumbersome to implement in HTML, what if the fault lies not with HTML, but with REST.
 Perhaps REST served as a useful guideline for the early days of the web, but is no longer up to the
 demands of modern web applications? This is not so.
 
 <p>
+Fielding writes:
+
+<blockquote>
+REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution.
+Many of the constraints are directly opposed to short-term efficiency. [...]
+There are more than a few software methodologies that portray any long-term thinking as wrong-headed, ivory tower design (which it can be if it isn't motivated by real requirements).<f-note>
+<a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-724">"Rest APIs Must be Hypertext Driven"</a>, Comment #8
+</f-note>
+</blockquote>
+
+<p>
+What REST was designed to do, and the benchmark against which we should evaluate it, is build software systems that last for decades.
+The Web itself has lasted for decades, but the Web is only useful insofar as it comprises useful services; how does REST enable web <em>developers</em> to build services that last as long as the web does?
+
+<p>
+an enormous amount of that durability is guaranteed not by the idea of REST, but by the implementation of HTML.
+
+
+<!-- One of these software systems is the World Wide Web itself, which REST was designed to describe and direct. Despite fierce competition from desktop and mobile applications, the web remains arguably the dominant platform for application development today. But -->
+
+<p>
 REST outlines a powerful framework for building durable, distributed hypermedia applications on the
-web platform.
+web platform, but
+
+<p>
+The fact that REST has developed—in the 24 years since Fielding's dissertation—in a manner that emphasizes the HTTP method, while HTML still does not properly support said method, is not evidence that REST, HTTP, and HTML are stale paradigms—it is evidence that they are durable, growing paradigms that evolve very slowly. This is their chief advantage over every other manner of writing software.
 
 <p>
 The inclusion of proper REST facilities in HTML makes REST the easier and simplest thing to do
@@ -765,6 +931,8 @@ This would cement the web as the dominant infrastructure platform for essential 
 reliability and accessibility are prized above all else.
 
 <h2>Additional Benefits</h2>
+<div class=notice>Pretty much everything after this is still unfinished</div>
+
 Prior variations on this proposal failed to generate the necessary traction to get implemented,
 which burdens the concept with considerable inertia.<f-note>
 Citation needed.
