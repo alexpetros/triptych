@@ -7,12 +7,15 @@
 <h1>Support PUT, PATCH, and DELETE in HTML Forms</h1>
 
 <dl>
-  <dt>Author</dt>
-  <dd>Alexander Petros <a href="mailto:contact@alexpetros.com">(contact@alexpetros.com</a>)</dd>
+  <dt>Authors</dt>
+  <dd>
+    Alexander Petros (<a href="mailto:contact@alexpetros.com">contact@alexpetros.com</a>)<br>
+    Carson Gross (<a href="mailto:carson@bigsky.software">carson@bigsky.software</a>)
+  </dd>
   <dt>Date Created</dt>
-  <dd>July xx, 2024
+  <dd>August xx, 2024
   <dt>Last Updated</dt>
-  <dd>July xx, 2024
+  <dd>August xx, 2024
   <dt>Status</dt>
   <dd style="color: red;">Unpublished</dd>
 
@@ -179,48 +182,6 @@ And the server could choose to either send a delete confirmation page, or redire
 
 
 <h2>Additional Considerations</h2>
-<h3>Navigation</h3>
-<h4>Rendering</h4>
-If the response status code is not a redirection code (300-399), the browser should display the body
-of the response in the page, exactly the same way it would for the response of a POST form.
-It should likewise update the page URL and history.
-
-<h4>Redirection</h4>
-<p>
-For PUT, PATCH, and DELETE requests, if the server responds with a 301, 302, or 307 status code, the browser should perform a subsequent request with the same HTTP method;
-if the server responds with a 303 status code, the browser should perform a subsequent request as a GET request.
-
-<p>
-When browsers receive a 302 response to a POST form, they typically follow that redirect
-automatically and change the method to GET;
-there is no need for this behavior to apply to PUT, PATCH, and DELETE.
-Changing POST to GET in this fashion is a backwards compatibility carveout in the spec, which has not been applied to other methods in browsers' fetch implementations.
-Using a 303 instead of a 302 is already a well-understood pattern for server frameworks that support these methods, so no additional carveouts are needed to integrate with them.<f-note>
-For instance, <a
-  href="https://stackoverflow.com/questions/33214717/why-post-redirects-to-get-and-put-redirects-to-put">ExpressJS</a>
-and <a href="https://stackoverflow.com/questions/71975005/rails-not-redirecting-on-put-request-sending-406-back-instead">Rails</a>.
-</f-note>
-
-<p>
-This resolves a blocker for the original Firefox beta implementation.<f-note>
-On 01/12/2011, at 9:57 PM,
-<a href="https://lists.w3.org/Archives/Public/public-html-comments/2011Apr/0000.html">
-Julian Reschke wrote:</a>
-<q>One thing I forgot earlier, and which was the reason why I actually wanted PUT and DELETE
-temporarily (!) on hold is redirect handling. The experimental Firefox implementation was copying
-the redirect handling for POST (with respect to method rewriting), and it would have been bad to let
-this get into the deployed platform. The experimental Firefox implementation was copying the
-redirect So it would be good to clarify that PUT and DELETE, when being redirected by 301/302 should
-*not* be rewritten to GET.</q>
-</f-note>
-
-<h4>Refresh Button</h4>
-<p>
-For PATCH requests, which are not idempotent, the user agent should behave as it does currently, asking the user for confirmation and warning that it may cause the data to be re-submitted.
-
-<p>
-For PUT and DELETE requests, which are idempotent, the user agent should resubmit the request.
-This allows servers to take advantage of the method semantics and create forms that users on un-reliable connections can feel confident re-submitting.
 
 <h3 id=body-content>Body Content</h3>
 
@@ -231,8 +192,9 @@ PUT and PATCH forms should send identical content to their POST equivalents.<f-n
 request.
 </f-note>
 
+<f-note>
 All three methods support the same Content-Type headers, and they are differentiated from each
-other based on the intent for the enclosed representation, not the representation itself.<f-note>
+other based on the intent for the enclosed representation, not the representation itself.
 Per <a href="https://www.rfc-editor.org/rfc/rfc9110.html#name-put">RFC9110</a>, the difference
 between POST and PUT <q>is highlighted by the different intent for the enclosed representation,</q>
 which implies that they support the same set of representations. Per
@@ -242,8 +204,9 @@ enclosed entity to modify the resource</q>, which again implies that they are ca
 representing resources the same way.
 </f-note>
 Server frameworks that support PUT and PATCH handle their bodies identically to POST bodies;
-the addition of these methods to HTML will be supported by a significant percentage of servers out
-of the gate.<f-note>Citation needed.</f-note>
+the vast majority of servers will support the new feature out of the gate.<f-note>
+For examples, see <section-ref ref="rest-server-support">Section 6.3</section-ref>
+</f-note>
 
 <p>
 DELETE forms should format their content as URL parameters, like GET forms. While both GET and
@@ -285,13 +248,144 @@ PUT and DELETE responses are never cacheable.<f-note>
 
 
 
-<h3>CORS</h3>
-<div class=notice>More detail needed here</div>
-<p>
-To start, browsers should prohibit cross-origin requests with the new methods.
+<h3 id=cors>CORS</h3>
 
 <p>
-CORS support can be added later.
+In the interest of limiting the scope of the proposal, browsers should, to start, only support PUT, PATCH, and DELETE forms that are making same-origin requests.
+
+<h4>Background</h4>
+
+<p>
+A cross-origin request is when a webpage at one origin (typically, this means a domain) attempts to request a resource from a different origin.
+Modern browsers block most cross-origin requests by default, as a security feature.
+Among other benefits, blocking cross-origin requests significantly mitigates the attack surface for malicious websites to take unwanted actions against other servers on the user's behalf—in particular via Cross-Site Request Forgery (CSRF).
+
+<p>
+There are, however, instances in which servers want to explicitly opt-in to cross-origin requests.
+Cross-Origin Resource Sharing (CORS) is a header-based mechanism that allows them to do so.
+When a website makes a request to a server with a different origin than its own, the browser will, in most cases, send a "preflight request" to ask that server to what extent it permits loading its resources on other pages.
+
+<p>
+HTML forms predate CORS, so CORS contains a number of exceptions to the same-origin policy, designed to keep from breaking existing web forms while still moving web security forward.
+The browser will not send a preflight request to cross-origin servers (it'll just make the request directly) if the request falls within certain confines—essentially the confines of what HTML forms were capable of prior to the specification of CORS.<f-note>
+The <a href="https://fetch.spec.whatwg.org/#general">fetch spec</a> actually goes a bit further and says: <q>for requests that are more involved than what is possible with HTML’s form element, a CORS-preflight request is performed, to ensure request’s current URL supports the CORS protocol.</q>
+This part would have to be amended slightly to unpeg CORS from what forms are capable of, since we advocate for extending form capabilities without adding to the <a href="https://fetch.spec.whatwg.org/#cors-safelisted-method">CORS-safelisted methods</a> or <a href="https://fetch.spec.whatwg.org/#cors-safelisted-request-header">CORS-safelisted request headers</a>.
+</f-note>
+
+<p>
+Therefore, expanding the scope of what is possible through the HTML form element also requires reckoning with how that impacts the scope of what is possible without a CORS pre-flight request.
+
+<!-- GET, HEAD, and POST requests that -->
+
+<h4>Recommendation</h4>
+
+<p>
+The browser should disallow cross-origin PUT, PATCH, and DELETE forms, logging the error to the console.
+This minimizes implementation complexity as much as possible while still meeting the proposal's goals of incentivizing same-origin RESTful application development by making it the simplest way to build an interactive web service.
+
+<!-- <p> -->
+<!-- The motivation for including PUT, PATCH, and DELETE support in HTML forms is to make safe, secure, same-origin RESTful application development as easy as possible. -->
+
+<!-- Explicitly omitting CORS support from this proposal reduces the implementation complexity for browser vendors, solves the majority use-case, and leaves the door open for CORS support later, vendor interest permitting. -->
+
+<p>
+First and foremost, new browser features must not expose existing servers or users to new vulnerabilities, so adding new CORS-safelisted methods or headers is out of the question.<f-note>
+<a href="https://github.com/whatwg/html/issues/3577#issuecomment-625880214">@annevk on issue #3577</a> <q>the same-origin policy cannot be extended further as that would put servers at risk.</q>
+</f-note>
+Fortunately, there is no need to do so.
+
+<p>
+PUT, PATCH, and DELETE forms simply make available to HTML a highly useful subset of what is <em>already available</em> to the web page, via JavaScript.
+JavaScript is capable of making single-origin and cross-origin PUT requests; we propose that HTML be capable of making single-origin requests, which does not extend the median browsers' capabilities at all.<f-note>
+The word "median" is used here to acknowledge that, technically, this does make new HTTP methods available to browsers which have scripting disabled.
+The overwhelming majority of browser users, especially the ones most vulnerable to malicious websites, do not having scripting disabled, and the methods we propose adding are more secure than the POST method that is already available.
+</f-note>
+
+<p>
+Moreover, the addition of CORS-restricted methods to HTML forms provides a massive opportunity to move developers onto a more secure pattern web applications.
+PUT, PATCH, and DELETE requests are more secure, by default, than POST requests, because they will <em>never</em> be issued to a cross-origin server unless that server explicitly permits them.<f-note>
+This is another, highly significant, reason not to tunnel PUT and DELETE through POST requests with ad-hoc semantics, one that did not exist when Amundsen et. al were arguing for PUT and DELETE support in
+<a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c4">WHATWG Bug 10671</a>.
+</f-note>
+Because POST is the only unsafe method currently available to HTML forms, the introduction of PUT and DELETE necessarily displaces usage of POST methods, reducing the number of webforms that are vulnerable to CSRF due to backwards compatibility concerns.<f-note>
+It also opens the door for the possibility of introducing a new method (i.e. CREATE) that serves a similar purpose to POST but is unburdened by the same backwards compatibility concerns.
+POST could continue to serve as a <a href="https://roy.gbiv.com/untangled/2009/it-is-okay-to-use-post"><q>this action isn't worth standardizing</q></a> method, and work for legacy applications.
+</f-note>
+
+<!-- <a href="https://github.com/httpwg/http-extensions/issues/2228">@annevk on issue #2228</a> <q>changes to form submission will be hard. And almost definitely any new kind of cross-origin method would require some kind of opt-in as the safety we care about is not that of the method definition of safety, but that of end users.</q> -->
+
+
+<!-- Giving developers access to them in HTML dramatically reduces the difficulty of taking advantage of these more-secure methods. -->
+
+<p>
+In this manner, CORS restrictions can be leveraged to deepen the web security pit of success.
+Sites that make no cross-origin requests are easier to secure than sites that do.<f-note>
+CORS and the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value">SameSite Attribute</a> dramatically reduce the opportunity for attackers to execute cross-site requests.
+</f-note>
+Sites that use REST verbs properly are easier to secure than sites that don't.<f-note>
+The <a href="https://developer.mozilla.org/en-US/docs/Glossary/CSRF">MDN Page for CSRF</a> ends with this note: <q>There are many ways to prevent CSRF, such as implementing [sic] RESTful API, adding secure tokens, etc.</q>
+Unfortunately, it doesn't describe how a RESTful API might mitigate CSRF.
+What they likely mean by this is that ensuring GET requests do not have side effects mitigates a number of CSRF pathways, but it's also true that HTML does not does not properly support RESTful APIs, nor does it currently have the ability to make any unsafe HTTP requests that are fully protected by CORS.
+For more on the importance of supporting REST and the ways in which HTML support is inadequate, see <section-ref ref=completing-rest>Section 5</section-ref>.
+</f-note>
+Web forms that make using REST verbs trivial for same-site requests—especially REST verbs that are not safelisted by CORS—incentivize the simplest, most secure patterns by also making them the easiest to implement.
+
+<!-- <f-note> -->
+<!-- CORS is a mechanism for lifting the browser's security guarantees; rather than lift them, developers should be provided a path of least resistance to comply with them. -->
+<!-- </f-note> -->
+
+<h3>Navigation</h3>
+<h4>Rendering</h4>
+If the response status code is not a redirection code (300-399), the browser should display the body
+of the response in the page, exactly the same way it would for the response of a POST form.
+It should likewise update the page URL and history.
+
+<h4>Redirection</h4>
+<p>
+For PUT, PATCH, and DELETE requests, if the server responds with a 301, 302, or 307 status code, the browser should perform a subsequent request with the same HTTP method;
+if the server responds with a 303 status code, the browser should perform a subsequent request with the GET method.<f-note>
+When browsers receive a 302 response to a POST form, they typically follow that redirect
+automatically and change the method to GET;
+there is no need for this behavior to apply to PUT, PATCH, and DELETE.
+Changing POST to GET in this fashion is a backwards compatibility carveout in the spec, which has not been applied to other methods in browsers' fetch implementations.
+Using a 303 to perform POST-redirect-GET flow (replacing POST with PUT or DELETE) is already a well-understood pattern for server frameworks that support these methods, so no additional carveouts are needed to integrate with them.
+
+For instance, <a
+  href="https://stackoverflow.com/questions/33214717/why-post-redirects-to-get-and-put-redirects-to-put">ExpressJS</a>
+and <a href="https://stackoverflow.com/questions/71975005/rails-not-redirecting-on-put-request-sending-406-back-instead">Rails</a>.
+</f-note>
+
+<p>
+The browser should only follow redirects to servers of the same origin.<f-note>
+For more on potential future CORS support, see <section-ref ref=alternative-cors-support>Section 8.2</section-ref>
+</f-note>
+If the server responds to any of the new methods with a redirect to a server of a different origin, the browser should display an error indicating that the server tried to redirect the page in a manner that is unsupported at this time.<f-note>
+The navigation flow we propose here is one in which the browser "quietly" fails to execute an explicit cross-origin request (simply logging to the console and taking no further action), but "loudly" fails to execute a cross-origin redirect, in a similar manner to how the browser will display a full-screen error for an infinite redirect or an expired TLS certificate.
+
+<br><br>
+This is a compromise between the way the browser handles JavaScript-based CORS failures (quietly) and how the browser generally handles navigation failures (loudly). Other options are available depending on the recommendations on editors and implementers.
+</f-note>
+
+
+<p>
+This resolves a blocker for the original Firefox beta implementation.<f-note>
+On 01/12/2011, at 9:57 PM,
+<a href="https://lists.w3.org/Archives/Public/public-html-comments/2011Apr/0000.html">
+Julian Reschke wrote:</a>
+<q>One thing I forgot earlier, and which was the reason why I actually wanted PUT and DELETE
+temporarily (!) on hold is redirect handling. The experimental Firefox implementation was copying
+the redirect handling for POST (with respect to method rewriting), and it would have been bad to let this get into the deployed platform.
+The experimental Firefox implementation was copying the redirect.
+So it would be good to clarify that PUT and DELETE, when being redirected by 301/302 should *not* be rewritten to GET.</q>
+</f-note>
+
+<h4>Refresh Button</h4>
+<p>
+For PATCH requests, which are not idempotent, the user agent should behave as it does currently, asking the user for confirmation and warning that it may cause the data to be re-submitted.
+
+<p>
+For PUT and DELETE requests, which are idempotent, the user agent should resubmit the request.
+This allows servers to take advantage of the method semantics and create forms that users on unreliable connections can feel confident re-submitting.
 
 <h2 id=completing-rest>Completing REST</h2>
 In 2000, Roy Fielding published a PhD dissertation in which he introduced the Representational State
@@ -324,8 +418,12 @@ constraints of REST—specifically the constraint that messages need to be self-
 interaction is stateless between requests, standard methods and media types are used to indicate
 semantics and exchange information, and responses explicitly indicate cacheability.</q>
 </f-note>
-He does not, however, get into the specifics of which methods are necessary. His
-main concern is that the name of the method should not affect the parsing of the HTTP request, as
+He does not, however, address which methods are necessary.<f-note>
+<a href="https://roy.gbiv.com/untangled/2009/it-is-okay-to-use-post">Fielding, in 2009:</a> <q>Search my dissertation and you won’t find any mention of CRUD or POST.
+The only mention of PUT is in regard to HTTP’s lack of write-back caching.
+The main reason for my lack of specificity is because the methods defined by HTTP are part of the Web’s architecture definition, not the REST architectural style.</q>
+</f-note>
+His main concern is that the name of the method should not affect the parsing of the HTTP request, as
 that would require out-of-band agreement on method semantics and limit the extensibility of the
 method field.<f-note>
 <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_3_1_2">
@@ -335,8 +433,7 @@ method field.<f-note>
 
 <p>
 Fielding actually appears to be somewhat ambivalent about whether the client should have
-<em>any</em> understanding of method semantics. He doesn't say too much more about HTTP methods in
-the dissertation, but in a comment on his blog, he writes:
+<em>any</em> understanding of method semantics. In 2008, he writes:
 
 <blockquote>
 <q>You don’t get to decide what POST means — that is decided by the resource. Its purpose is
@@ -346,15 +443,23 @@ supposed to be described in the same context in which you found the URI that you
 </f-note>
 </blockquote>
 
-That GET, POST, and PUT have a semantic meaning outside the context of the application (GET is
-safe, POST is not, and so on) is a secondary concern; the primary obligation of the client is to
-allow the hypermedia API to describe itself, and then faithfully execute that description.<f-note>
-Since REST was designed to describe an infrastructure in which some HTTP methods already had semantic meaning, it's unlikely that Fielding would suggest we throw out that meaning
-  In a different comment on the same blog, Fielding refers to a GET request as a <a
-  href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-730">"retrieval
-  request"</a>, which suggests a willingness to include agreed-upon method semantics within the
-confines of a "self-describing" API.
+That GET, POST, and PUT have semantic meaning outside the context of the application is a secondary concern;
+the primary obligation of the client is to allow the hypermedia API to describe itself, and then faithfully execute that description.<f-note>
+Fielding's comments on method usage are somewhat contradictory.
+In <cite class=article><a href="https://roy.gbiv.com/untangled/2009/it-is-okay-to-use-post">It is okay to use POST</a></cite>, he seems broadly committed to the principle that the server gets to define what the methods mean, reminding readers that specific <q>method definitions (aside from the retrieval:resource duality of GET) simply don’t matter to the REST architectural style</q>.
+He also asks: <q>why shouldn't you use POST to perform an update? Hypertext can tell the client which method to use when the action being taken is unsafe.</q>
+
+<br><br>
+
+But in the next paragraph, he says that POST is an issue <q>when it is used in a situation some other method is ideally suited,</q> including <q>complete replacement of a representation (PUT)</q>.
+So it's fine to use POST to update a resource, unless your update is a complete representation of that resource, in which case it's not?
+Is it fine to use POST method to delete a resource, a task for which DELETE is ideally suited?
+
+<br><br>
+The most reasonable way to interpret Fielding's statements here (and the statements referenced in the following footnote) is that REST is primarily concerned with defending the distributed system's ability to write self-describing messages, but deliberately unconcerned with what those messages mean, as long as they do not violate any of the already-established out-of-band agreements enshrined within the protocols themselves.
+This allows for some necessary compromises to the theoretical purity of self-description—like the user agent being able build security features around the knowledge that GET requests are safe—while still allowing for method extension and graceful fallback.
 </f-note>
+
 The HTML form element's transformation of any non-GET, non-POST method into a GET violates this principle.<f-note>
 n.b. Fielding's <a
 href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be
@@ -412,7 +517,7 @@ respectively.
 
 <p>
 The increased salience of HTTP methods to REST is not a perversion of the concept, but a practical evolution of it, born from real-world use.
-Aspirational REST adherents have discovered that it is incredibly helpful to have a standardized semantic for to describe <em>how</em> the enclosed resource is to be modified.
+Aspirational REST adherents have discovered that it is much easier to uphold a consistent representation of a resource (via URIs) when you have a standardized semantic for to describe <em>how</em> the enclosed resource is to be modified.
 
 <p>
 For instance, this overview is from the first API tutorial in the latest ASP.NET Core documentation:<f-note>
@@ -477,14 +582,76 @@ describe and code than a <code>POST /users/123</code> API whose body semantics a
 <p>
 The usefulness of methods as an HTTP semantic—<i>a priori</i> to the semantics of the methods
 themselves—is so self-evident that the hypertext transfer protocol has long standardized a bunch of
-additional methods; all that remains is for the dominant hypertext markup to support them.
+additional methods; all that remains is for the dominant hypertext markup to support them.<f-note>
+The purpose of describing REST in this detail, and the "REST in Practice" subsection in particular,
+is to make clear that REST is not an ivory tower architecture that developers have failed to follow; it's an attempt to explain the best real-world developer practices and model the ways in which user agents can support them. The lack of proper method support is a <a href="https://www.w3.org/TR/html-design-principles/#solve-real-problems">real problem</a> that developers continually work around. For evidence of this, see <section-ref ref=ecosystem-demand>Section 6: Ecosystem Demand</section-ref>.
+</f-note>
 
-<h3>Ecosystem Demand</h3>
+<h3>REST and its Hypermedia Representation</h3>
+<p>
+We know that REST APIs must return hypertext, but we propose two additional constraints on the hypermedia and the user-agent that renders it:
+<ol>
+  <li>
+    The hypermedia representation must be backwards-comaptible;
+    user-agents that support it must old markup faithfully.
+  <li>
+    The hypermedia representation must be forwards-compatible;
+    user-agents that support it must degrade gracefully in response to new markup.
+</ol>
+We propose that for REST to succeed in its design, the hypermedia representation must have two qualities: it must be sufficient to
+
+<f-note>
+Although hypermedia representations are a core tenet of REST, relatively little is said in the thesis about the necessary qualities of that hypermedia representation. Chapter 6 contains sections on <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_2">"Rest Applied to URI"</a> and <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_3">"REST Applied to HTTP"</a> but not "REST Applied to HTML."
+</f-note>
+
+
+<h3>Software Design on the Scale of Decades</h3>
+<p>
+If REST is so cumbersome to implement in HTML, what if the fault lies not with HTML, but with REST.
+Perhaps REST served as a useful guideline for the early days of the web, but is no longer up to the demands of modern web applications?
+This is not so.
+
+<p>
+Fielding writes:
+
+<blockquote>
+REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution.
+Many of the constraints are directly opposed to short-term efficiency. [...]
+There are more than a few software methodologies that portray any long-term thinking as wrong-headed, ivory tower design (which it can be if it isn't motivated by real requirements).<f-note>
+<a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-724">"Rest APIs Must be Hypertext Driven"</a>, Comment #8
+</f-note>
+</blockquote>
+
+<p>
+REST was designed to build software systems that last for decades, and it is against that benchmark that REST should be evaluated.
+The Web itself has lasted for decades, but the Web is only useful insofar as it comprises useful services;
+does REST succeed at helping web <em>developers</em> to build services that last as long as the web does?
+
+an enormous amount of that durability is guaranteed not by the idea of REST, but by the implementation of HTML.
+
+
+<!-- One of these software systems is the World Wide Web itself, which REST was designed to describe and direct. Despite fierce competition from desktop and mobile applications, the web remains arguably the dominant platform for application development today. But -->
+
+<p>
+REST outlines a powerful framework for building durable, distributed hypermedia applications on the
+web platform, but
+
+<p>
+The fact that REST has developed—in the 24 years since Fielding's dissertation—in a manner that emphasizes the HTTP method, while HTML still does not properly support said method, is not evidence that REST, HTTP, and HTML are stale paradigms—it is evidence that they are durable, growing paradigms that evolve very slowly. This is their chief advantage over every other manner of writing software.
+
+<p>
+The inclusion of proper REST facilities in HTML makes REST the easier and simplest thing to do
+
+<p>
+This would cement the web as the dominant infrastructure platform for essential services, were
+reliability and accessibility are prized above all else.
+
+<h2 id=ecosystem-demand>Ecosystem Demand</h2>
 
 Lacking proper browser support, developers still consider method semantics important enough to their
 API design that they come up with ad-hoc methods to achieve the same result.
 
-<h4>The hidden input hack</h4>
+<h3>The hidden input hack</h3>
 
 <p>
 The most common way that developers compensate for the lack of proper HTTP method support is to
@@ -518,19 +685,14 @@ These points are not new; many of them were made by Mike Amundsen in the closed
 </f-note>
 
 <ul>
-  <li>Unlike POST, PUT and DELETE are idempotent, which gives the client more leeway to recover
-    from network failures
-  <li>HTTP methods are typically logged while HTTP bodies are not; services that break up their
-    unsafe requests across POST, PUT, and DELETE have a smaller surface to debug than ones where all
-    unsafe request are tunneled through POST.
-  <li>HTTP methods are a powerful filtering tool for debugging across the stack—server logs,
-    application logs, and the browser network tab.
-  <li>Routing is fundamental to server logic, and including an additional variable for routing
-    dramatically simplifies the server logic that would otherwise have to compensate by performing
-    additional routing imperatively.
+  <li>Unlike POST, PUT and DELETE are idempotent, which gives the client more leeway to recover from network failures
+  <li>HTTP methods are typically logged while HTTP bodies are not; services that break up their unsafe requests across POST, PUT, and DELETE have a smaller surface to debug than ones where all unsafe request are tunneled through POST.
+  <li>HTTP methods are a powerful filtering tool for debugging across the stack—server logs, application logs, and the browser network tab.
+  <li>Routing is fundamental to server logic, and including an additional variable for routing dramatically simplifies the server logic that would otherwise have to compensate by performing additional routing imperatively.
+  <li>PUT and DELETE do not have the same CORS exemptions that POST does, making them more secure for clients (discussed in <section-ref ref=cors>Section 4.3</section-ref>)
 </ul>
 
-<h4>Ad-hoc URI semantics</h4>
+<h3>Ad-hoc URI semantics</h3>
 
 <p>
 Another workaround is to encode the method semantics straight into the URI.
@@ -588,7 +750,7 @@ to augment or abandon HTML rather than throw out URI semantics along with them.
 <!-- Without proper method support, -->
 
 
-<h4>REST support in Server Frameworks</h4>
+<h3 id=rest-server-support>REST support in Server Frameworks</h3>
 
 <p>
 Support for all HTTP methods is widespread in server side frameworks.  Currently, this support is
@@ -615,6 +777,7 @@ for HTTP methods.
   <td>
     <a href="https://expressjs.com">
       Express
+    </a>
     </a>
     </a>
   </td>
@@ -739,8 +902,10 @@ for HTTP methods.
 </tr>
 </table>
 
+
 <h4>REST support in client libraries</h4>
 
+<h3>Software Design on the Scale of Decades</h3>
 <p>
 Support for all HTTP methods is also widespread in client side frameworks.  Interestingly, this support is
 increasingly used for HTML-based APIs, in additional to JSON-based APIs, indicating that there is demand
@@ -821,7 +986,7 @@ the various HTTP.
   </tbody>
 </table>
 
-<h4>Usage of Non-GET & Non-POST Methods</h4>
+<h3>Usage of Non-GET & Non-POST Methods</h3>
 
 <p>
 While the above table establishes the general support for the full gamut of HTTP methods, it does not establish the
@@ -927,47 +1092,6 @@ delete that reservation.
 With the addition of the <code>DELETE</code> method, web developers can follow the natural, resource-oriented URL
 pattern.
 
-<h3>Software Design on the Scale of Decades</h3>
-<p>
-If REST is so cumbersome to implement in HTML, what if the fault lies not with HTML, but with REST.
-Perhaps REST served as a useful guideline for the early days of the web, but is no longer up to the
-demands of modern web applications? This is not so.
-
-<p>
-Fielding writes:
-
-<blockquote>
-REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution.
-Many of the constraints are directly opposed to short-term efficiency. [...]
-There are more than a few software methodologies that portray any long-term thinking as wrong-headed, ivory tower design (which it can be if it isn't motivated by real requirements).<f-note>
-<a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-724">"Rest APIs Must be Hypertext Driven"</a>, Comment #8
-</f-note>
-</blockquote>
-
-<p>
-What REST was designed to do, and the benchmark against which we should evaluate it, is build software systems that last for decades.
-The Web itself has lasted for decades, but the Web is only useful insofar as it comprises useful services; how does REST enable web <em>developers</em> to build services that last as long as the web does?
-
-<p>
-an enormous amount of that durability is guaranteed not by the idea of REST, but by the implementation of HTML.
-
-
-<!-- One of these software systems is the World Wide Web itself, which REST was designed to describe and direct. Despite fierce competition from desktop and mobile applications, the web remains arguably the dominant platform for application development today. But -->
-
-<p>
-REST outlines a powerful framework for building durable, distributed hypermedia applications on the
-web platform, but
-
-<p>
-The fact that REST has developed—in the 24 years since Fielding's dissertation—in a manner that emphasizes the HTTP method, while HTML still does not properly support said method, is not evidence that REST, HTTP, and HTML are stale paradigms—it is evidence that they are durable, growing paradigms that evolve very slowly. This is their chief advantage over every other manner of writing software.
-
-<p>
-The inclusion of proper REST facilities in HTML makes REST the easier and simplest thing to do
-
-<p>
-This would cement the web as the dominant infrastructure platform for essential services, were
-reliability and accessibility are prized above all else.
-
 <h2>Additional Benefits</h2>
 <div class=notice>Pretty much everything after this is still unfinished</div>
 
@@ -1006,25 +1130,38 @@ Encourage HTML writing
 <p>
 Lots of perf gains to be had with better HTTP method use
 
+<p>
 caching?
 
-
-<h2>History</h2>
-
-
-<h2>Alternatives and Optional Proposals</h2>
-<h3>Alternative: Omit PATCH</h3>
+<h2>Alternatives and Additions</h2>
+<h3>Omit PATCH</h3>
 <p>
-PUT and DELETE are necessary to include a full REST grammar in HTML; PATCH is not.
+PUT and DELETE are necessary to include a full CRUD grammar in HTML; PATCH is not.
 
-<h3>Optional: Allow Cross-Origin Requests with CORS</h3>
+<p>
+If you are going to do the work to generalize the <code>&lt;/form&gt;</code> method attribute anyway, it doesn't seem like there's huge benefit to omitting PATCH. Nevertheless, the proposal could mostly success in its goals without PATCH, since most RESTful design practices focus on PUT and DELETE.
 
-<h3>Optional: DELETE request bodies</h3>
+<h3 id=alternative-cors-support>Include CORS Support</h3>
+<p>
+Between supporting a same-origin mode for form navigation versus implementing CORS for form navigation, spec editors have indicated that the former is the less-difficult option.<f-note>
+<a href="https://github.com/whatwg/html/issues/3577#issuecomment-625880214">@annevk:</a>
+<q>Same-origin is probably less work than CORS, but it's still a lot of work.</q>
+</f-note>
+In the interest of minimizing the barriers to implementation, we recommend starting with a same-origin mode—which still leaves the door open to CORS support in the future.
+
+<p>
+If, however, implementers were interested in supporting cross-origin PUT, PATCH, and DELETE requests right out of the gate, we would have no objection. After all, the fetch spec supports CORS for these methods, there's no reason HTML shouldn't.
+
+<p>
+If and when CORS support is eventually added, a redirect to a cross-origin server should trigger a preflight request to that new server, <a href="https://github.com/whatwg/fetch/commit/0d9a4db8bc02251cc9e391543bb3c1322fb882f2">to match the spec</a>, and cancel navigation with an error if the new server does not respond with the appropriate CORS headers.
+It's possible that new, navigation-specific CORS headers could be added as well.
+
+<h3>Allow for DELETE request bodies</h3>
 <p>
 There's no inherent reason why a DELETE request couldn't send body content, and many popular
 frameworks, like ExpressJS, do support it. Nor is DELETE content expressly prohibited by the spec,
 which allows for such requests if the origin server has indicated that it supports them.
-Since most HTML forms are same-origin, it could sense to allow the form to indicate that it would be
+Since most HTML forms are same-origin, it could make sense to allow the form to indicate that it would be
 fine with DELETE content,
 
 <p>
