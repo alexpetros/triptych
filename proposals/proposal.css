@@ -7,6 +7,7 @@
   --notice-color: bisque;
   --blockquote-background: #f9f9f9;
   --blockquote-accent: #ccc;
+  --highlight-color: lightyellow;
 
   color: var(--text-color);
   background-color: var(--page-background);
@@ -23,6 +24,7 @@
     --notice-color: maroon;
     --blockquote-background: black;
     --blockquote-accent: darkgray;
+    --highlight-color: maroon;
   }
 }
 
@@ -125,7 +127,7 @@ p.footnote {
 }
 
 p.footnote:target {
-  background-color: yellow;
+  background-color: var(--highlight-color);
 }
 
 table {
