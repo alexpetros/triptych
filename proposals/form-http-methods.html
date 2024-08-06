@@ -468,9 +468,8 @@ hypertext-driven" blog</a> does include the follow bullet:
 or fixing the details of underspecified bits of standard protocols, such as HTTP’s PATCH method or
 Link header field. Workarounds for broken implementations (such as those browsers stupid enough to
 believe that HTML defines HTTP’s method set) should be defined separately, or at least in
-appendices, with an expectation that the workaround will eventually be obsolete.</q> Exactly what he
-means by <q>browsers stupid enough to believe that HTML defines HTTP’s method set</q> is a little
-vague, but it clearly demonstrates frustration with HTML's limited method support.
+appendices, with an expectation that the workaround will eventually be obsolete.</q>
+Exactly what he means by <q>browsers stupid enough to believe that HTML defines HTTP’s method set</q> is a little vague, but it clearly demonstrates frustration with HTML's limited method support.
 </f-note>
 
 <p>
@@ -587,64 +586,94 @@ The purpose of describing REST in this detail, and the "REST in Practice" subsec
 is to make clear that REST is not an ivory tower architecture that developers have failed to follow; it's an attempt to explain the best real-world developer practices and model the ways in which user agents can support them. The lack of proper method support is a <a href="https://www.w3.org/TR/html-design-principles/#solve-real-problems">real problem</a> that developers continually work around. For evidence of this, see <section-ref ref=ecosystem-demand>Section 6: Ecosystem Demand</section-ref>.
 </f-note>
 
-<h3>REST and its Hypermedia Representation</h3>
-<p>
-We know that REST APIs must return hypertext, but we propose two additional constraints on the hypermedia and the user-agent that renders it:
-<ol>
-  <li>
-    The hypermedia representation must be backwards-comaptible;
-    user-agents that support it must old markup faithfully.
-  <li>
-    The hypermedia representation must be forwards-compatible;
-    user-agents that support it must degrade gracefully in response to new markup.
-</ol>
-We propose that for REST to succeed in its design, the hypermedia representation must have two qualities: it must be sufficient to
-
-<f-note>
-Although hypermedia representations are a core tenet of REST, relatively little is said in the thesis about the necessary qualities of that hypermedia representation. Chapter 6 contains sections on <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_2">"Rest Applied to URI"</a> and <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_3">"REST Applied to HTTP"</a> but not "REST Applied to HTML."
-</f-note>
-
-
 <h3>Software Design on the Scale of Decades</h3>
-<p>
-If REST is so cumbersome to implement in HTML, what if the fault lies not with HTML, but with REST.
-Perhaps REST served as a useful guideline for the early days of the web, but is no longer up to the demands of modern web applications?
-This is not so.
 
 <p>
-Fielding writes:
+Developers motivated to do RESTful architecture can work around this limitation via scripting.
+So why does it need to be included in the hypertext?
 
-<blockquote>
-REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution.
-Many of the constraints are directly opposed to short-term efficiency. [...]
-There are more than a few software methodologies that portray any long-term thinking as wrong-headed, ivory tower design (which it can be if it isn't motivated by real requirements).<f-note>
-<a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-724">"Rest APIs Must be Hypertext Driven"</a>, Comment #8
+<p>
+Hypertext lasts.
+WHATWG maintains strict backwards compatibility guarantees and browser vendors support them—all the author has to do is keep serving the same HTML.
+For sites with no user-generated content, this can be as simple as holding onto the file.
+Pages encoded with pure HTML from the earliest days of the web run perfectly on the web browsers in your smartphone.<f-note>
+This includes everything from a <a href="https://first-website.web.cern.ch/first-website/node/24.html">1991 hypertext demo</a>, <a href="http://info.cern.ch/hypertext/WWW/TheProject.html">the very first web page</a>, and The Washington Post's <a href="https://www.washingtonpost.com/wp-srv/inatl/longterm/diana/dianastories.htm">special edition home page commemorating Princess Diana.</a>
 </f-note>
-</blockquote>
+Very little 20<sup>th</sup> century software can be run that easily on modern devices.
 
 <p>
-REST was designed to build software systems that last for decades, and it is against that benchmark that REST should be evaluated.
-The Web itself has lasted for decades, but the Web is only useful insofar as it comprises useful services;
-does REST succeed at helping web <em>developers</em> to build services that last as long as the web does?
+While "static sites" are the easiest type of website to preserve, the durability of hypertext-driven design applies to websites that accept user-generated submissions as well.<f-note>
+While an old directory of HTML files will almost certainly be easier to deploy than an old NodeJS project, many "dynamic" architectures are closer to the former than the latter.
+For instance, vanilla PHP can be written and deployed in almost exactly the same manner as HTML files.
+See also: <cite class="article"><a href="https://blog.wesleyac.com/posts/no-static-websites">There is no such thing as a static website</a></cite>
+</f-note>
+Not only can you browse Wikipedia with JavaScript disabled, you can create an account and edit pages too;
+with scripting enabled, the editing experience is augmented by a rich-text editor, but in most other respects the experience is close to identical.
+Wikipedia is a model application for the web, because the vast majority of its functionality can be described with hypertext primitives—including its relatively limited interactivity.<f-note>
+Wikipedia obviously supports enormous traffic, but the type of interactivity is mostly limited to creating and updating hypertext pages, as well as managing a user account, neither of which push the limits of what an HTML form can currently describe.
+</f-note>
 
-an enormous amount of that durability is guaranteed not by the idea of REST, but by the implementation of HTML.
+<!-- <p> -->
+<!-- We argue that HTML's inability to express RESTful application patterns is preventing developers from taking advantage of the web platform's marquee feature: its longevity. -->
+<!-- Removing the limitation on form methods would dramatically increase the volume and character of web applications that endure for decades, like static pages and Wikipedia. -->
 
+<p>
+The addition of new HTTP methods to form elements would expand the boundaries of what kinds of web application can be reasonably modeled with pure HTML.
+Authors for whom proper REST support is a priority will not have to automatically resort to scripting, and authors who have no conception of REST, but are starting with HTML as the easiest way to build a client, will be guided towards REST by ease of use.<f-note>
+Consider the cliched "to-do app" that is often the goal of beginner web tutorials.
+After implementing and experimenting with note creation, a beginner developer will ask themselves <q>well, how do I delete these?</q>
+The simplest, lowest-effort path to a delete button is going to be re-using the same route, but with a DELETE method—and all that has to be done on the client is add a new form with the same <code>action</code> and a new <code>method</code>.
+</f-note>
+
+<p>
+Finally, broadening the available form methods not only simplifies the client—it makes it possible to describe the "backend" of the application in a way that makes the server more fungible as well.
+A wide variety of languages and server frameworks have support for declaring routes and methods; the task of switching between them, if such becomes necessary, becomes easier the more the application can be described at that high level of abstraction.
+
+<!-- <p> -->
+<!-- In 2008, Fielding writes: -->
+
+<!-- <blockquote> -->
+<!-- REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution. -->
+<!-- Many of the constraints are directly opposed to short-term efficiency. [...] -->
+<!-- There are more than a few software methodologies that portray any long-term thinking as wrong-headed, ivory tower design (which it can be if it isn't motivated by real requirements).<f-note> -->
+<!-- <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-724">"Rest APIs Must be Hypertext Driven," Comment #8</a> -->
+<!-- </f-note> -->
+<!-- </blockquote> -->
+
+<!-- <p> -->
+<!-- With decades of practice, we have access to information that Fielding did not when he was describing the nascent web, namely, that the longevity of a service is directly correlated with the degree to which is able to represent itself without augmenting the hypertext; on the web, a service whose functionality can be built with mostly HTML is likely to last longer than one that relies more on JavaScript. -->
+
+<!-- <p> -->
+<!-- Included in the REST architectural style is the "optional constraint" of code-on-demand: client functionality can be extended by downloading and executing code in the form of applets or scripts. -->
+<!-- As an example, Fielding describes an organization that wants to run Java Applets from internal sources, but disables untrusted, external Applets.<f-note> -->
+<!-- https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_7 -->
+<!-- </f-note> -->
+
+<!-- <p> -->
+<!-- Java Applets were deprecated in 2017.<f-note> -->
+<!-- With the release of <a href="https://openjdk.org/jeps/289">JDK9</a>. -->
+<!-- </f-note> -->
+<!-- Adobe Flash, once a dominant method for creating and distributing interactive web media, was blocked from transitioning to the mobile web, discontinued in 2017. -->
+<!-- Microsoft Silverlight, which powered the early days of Netflix's web streaming platform, was discontinued in 2021. -->
+<!-- While all these code-on-demand extensions helped push the web platform forward, much of their functionality was eventually adopted into the standard, and web content from organizations that didn't have the resources to migrate it is now very hard to access.<f-note> -->
+<!-- The breadth <a href="https://edition.cnn.com/2021/09/10/tech/digital-news-coverage-9-11/">historical significance</a> of Flash-based web content, in particular, has spurred heroic efforts to preserve them, including the open-source flash emulator, <a href="https://ruffle.rs/">ruffle</a>, which is available for all major browsers. -->
+<!-- </f-note> -->
+
+<!-- <f-note> -->
+<!-- Although hypermedia representations are a core tenet of REST, relatively little is said in the thesis about the necessary qualities of that hypermedia representation. Chapter 6 contains sections on <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_2">"Rest Applied to URI"</a> and <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_3">"REST Applied to HTTP"</a> but not "REST Applied to HTML." -->
+<!-- </f-note> -->
+
+<!-- <p> -->
+<!-- If REST is so cumbersome to implement in HTML, what if the fault lies not with HTML, but with REST. -->
+<!-- Perhaps REST served as a useful guideline for the early days of the web, but is no longer up to the demands of modern web applications? -->
+<!-- This is not so. -->
 
 <!-- One of these software systems is the World Wide Web itself, which REST was designed to describe and direct. Despite fierce competition from desktop and mobile applications, the web remains arguably the dominant platform for application development today. But -->
 
-<p>
-REST outlines a powerful framework for building durable, distributed hypermedia applications on the
-web platform, but
-
-<p>
-The fact that REST has developed—in the 24 years since Fielding's dissertation—in a manner that emphasizes the HTTP method, while HTML still does not properly support said method, is not evidence that REST, HTTP, and HTML are stale paradigms—it is evidence that they are durable, growing paradigms that evolve very slowly. This is their chief advantage over every other manner of writing software.
-
-<p>
-The inclusion of proper REST facilities in HTML makes REST the easier and simplest thing to do
-
-<p>
-This would cement the web as the dominant infrastructure platform for essential services, were
-reliability and accessibility are prized above all else.
+<!-- <p> -->
+<!-- The inclusion of proper REST facilities in HTML makes REST the easier and simplest thing to do. -->
+<!-- It would cement the web as the dominant infrastructure platform for essential services, where -->
+<!-- reliability and accessibility are prized above all else. -->
 
 <h2 id=ecosystem-demand>Ecosystem Demand</h2>
 
