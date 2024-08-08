@@ -14,19 +14,19 @@
   scrollbar-gutter: stable;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text-color: #fff;
-    --page-background: black;
-    --link-color: lightblue;
-    --header-color: white;
-    --code-background: rgb(60, 60, 60);
-    --notice-color: maroon;
-    --blockquote-background: black;
-    --blockquote-accent: darkgray;
-    --highlight-color: maroon;
-  }
-}
+/* @media (prefers-color-scheme: dark) { */
+/*   :root { */
+/*     --text-color: #fff; */
+/*     --page-background: black; */
+/*     --link-color: lightblue; */
+/*     --header-color: white; */
+/*     --code-background: rgb(60, 60, 60); */
+/*     --notice-color: maroon; */
+/*     --blockquote-background: black; */
+/*     --blockquote-accent: darkgray; */
+/*     --highlight-color: maroon; */
+/*   } */
+/* } */
 
 body {
   font-family: Verdana;
