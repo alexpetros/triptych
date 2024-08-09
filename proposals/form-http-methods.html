@@ -1170,6 +1170,45 @@ HTML feasible as an application platform for use-cases where reliability, durabi
 are prized.
 
 
+<h3>Logout: A Specific Example</h3>
+
+<p>
+Here is a specific example of a common web application pattern that is not well-supported in HTML due to the lack of
+additional HTTP methods beyond <code>GET</code> and <code>POST</code>: a logout flow.  It is common in many web
+applications to have some sort of login functionality, creating a session for a user where their identity
+is established for future requests.
+
+Once a user has logged in, web applications typically allow users to then choose to log out of the web application.
+This is typically done in one of two ways:
+
+<ul>
+  <li>
+    The user clicks a link that issues a <code>GET</code> to a path (e.g. <code>/session</code>) to log them out.
+  </li>
+  <li>
+    The user clicks a button in a form that issues a <code>POST</code> to a path (e.g. <code>/session</code>) to log them out.
+  </li>
+</ul>
+
+Neither of these solutions is ideal, however:
+
+<ul>
+  <li>
+    The link-based <code>GET</code> causes a mutation of server state (it deletes the server).  This is in conflict
+    with the intended semantics of <code>GET</code> and  can interact poorly with other features of the web platform
+    such as <a href="https://georgemauer.net/2024/08/01/a-heck-of-a-wild-bug-chase.html">prefetch</a>.
+  </li>
+  <li>
+    The form-based <code>POST</code> does not suffer from the above issue, however the logout operation is
+    <em>idempotent</em> and should be safely reloadable, whereas a <code>POST</code> request is not.
+  </li>
+</ul>
+
+The ideal request for this common piece of functionality would be one that is known to be mutative, but is also
+known to be idempotent.  If HTML were able to issue a <code>DELETE</code> to <code>/session</code> it
+would satisfy both of these needs in a way that it currently cannot, making implementing this extremely common
+functionality less error-prone and more natural.
+
 <h3>Simplify Application Servers</h3>
 
 <p>
