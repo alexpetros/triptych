@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <title>Support PUT, PATCH, and DELETE in HTML Forms</title>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="./proposal.css">
@@ -268,7 +269,7 @@ When a website makes a request to a server with a different origin than its own,
 <p>
 HTML forms predate CORS, so CORS contains a number of exceptions to the same-origin policy, designed to keep from breaking existing web forms while still moving web security forward.
 The browser will not send a preflight request to cross-origin servers (it'll just make the request directly) if the request falls within certain confines—essentially the confines of what HTML forms were capable of prior to the specification of CORS.<f-note>
-The <a href="https://fetch.spec.whatwg.org/#general">fetch spec</a> actually goes a bit further and says: <q>for requests that are more involved than what is possible with HTML’s form element, a CORS-preflight request is performed, to ensure request’s current URL supports the CORS protocol.</q>
+The <a href="https://fetch.spec.whatwg.org/#general">fetch spec</a> actually goes a bit further and says: <q>for requests that are more involved than what is possible with HTML's form element, a CORS-preflight request is performed, to ensure request’s current URL supports the CORS protocol.</q>
 This part would have to be amended slightly to unpeg CORS from what forms are capable of, since we advocate for extending form capabilities without adding to the <a href="https://fetch.spec.whatwg.org/#cors-safelisted-method">CORS-safelisted methods</a> or <a href="https://fetch.spec.whatwg.org/#cors-safelisted-request-header">CORS-safelisted request headers</a>.
 </f-note>
 
@@ -415,9 +416,9 @@ interaction is stateless between requests, standard methods and media types are 
 semantics and exchange information, and responses explicitly indicate cacheability.</q>
 </f-note>
 He does not, however, address which methods are necessary.<f-note>
-<a href="https://roy.gbiv.com/untangled/2009/it-is-okay-to-use-post">Fielding, in 2009:</a> <q>Search my dissertation and you won’t find any mention of CRUD or POST.
-The only mention of PUT is in regard to HTTP’s lack of write-back caching.
-The main reason for my lack of specificity is because the methods defined by HTTP are part of the Web’s architecture definition, not the REST architectural style.</q>
+<a href="https://roy.gbiv.com/untangled/2009/it-is-okay-to-use-post">Fielding, in 2009:</a> <q>Search my dissertation and you won't find any mention of CRUD or POST.
+The only mention of PUT is in regard to HTTP's lack of write-back caching.
+The main reason for my lack of specificity is because the methods defined by HTTP are part of the Web's architecture definition, not the REST architectural style.</q>
 </f-note>
 His main concern is that the name of the method should not affect the parsing of the HTTP request, as
 that would require out-of-band agreement on method semantics and limit the extensibility of the
@@ -432,7 +433,7 @@ Fielding actually appears to be somewhat ambivalent about whether the client sho
 <em>any</em> understanding of method semantics. In 2008, he writes:
 
 <blockquote>
-<q>You don’t get to decide what POST means — that is decided by the resource. Its purpose is
+<q>You don't get to decide what POST means — that is decided by the resource. Its purpose is
 supposed to be described in the same context in which you found the URI that you are posting to.</q><f-note>
 <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-732">"REST APIs must be hypertext-driven", Comment #13</a>
 </f-note>
@@ -441,7 +442,7 @@ supposed to be described in the same context in which you found the URI that you
 That GET, POST, and PUT have semantic meaning outside the context of the application is a secondary concern;
 the primary obligation of the client is to allow the hypermedia API to describe itself, and then faithfully execute that description.<f-note>
 Fielding's comments on method usage are somewhat contradictory.
-In <cite class=article><a href="https://roy.gbiv.com/untangled/2009/it-is-okay-to-use-post">It is okay to use POST</a></cite>, he seems broadly committed to the principle that the server gets to define what the methods mean, reminding readers that specific <q>method definitions (aside from the retrieval:resource duality of GET) simply don’t matter to the REST architectural style</q>.
+In <cite class=article><a href="https://roy.gbiv.com/untangled/2009/it-is-okay-to-use-post">It is okay to use POST</a></cite>, he seems broadly committed to the principle that the server gets to define what the methods mean, reminding readers that specific <q>method definitions (aside from the retrieval:resource duality of GET) simply don't matter to the REST architectural style</q>.
 He also asks: <q>why shouldn't you use POST to perform an update? Hypertext can tell the client which method to use when the action being taken is unsafe.</q>
 
 <br><br>
@@ -460,11 +461,11 @@ n.b. Fielding's <a
 href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be
 hypertext-driven" blog</a> does include the follow bullet:
 <q>A REST API should not contain any changes to the communication protocols aside from filling-out
-or fixing the details of underspecified bits of standard protocols, such as HTTP’s PATCH method or
+or fixing the details of underspecified bits of standard protocols, such as HTTP's PATCH method or
 Link header field. Workarounds for broken implementations (such as those browsers stupid enough to
-believe that HTML defines HTTP’s method set) should be defined separately, or at least in
+believe that HTML defines HTTP's method set) should be defined separately, or at least in
 appendices, with an expectation that the workaround will eventually be obsolete.</q>
-Exactly what he means by <q>browsers stupid enough to believe that HTML defines HTTP’s method set</q> is a little vague, but it clearly demonstrates frustration with HTML's limited method support.
+Exactly what he means by <q>browsers stupid enough to believe that HTML defines HTTP's method set</q> is a little vague, but it clearly demonstrates frustration with HTML's limited method support.
 </f-note>
 
 <p>
@@ -714,9 +715,9 @@ API design that they come up with ad-hoc methods to achieve the same result.
 
 <p>
 The most common way that developers compensate for the lack of proper HTTP method support is to
-include a hidden input that overrides the method. This pattern is so common that it is supported by
-a variety of server-side frameworks.<f-note>
-Citation needed.
+include a hidden input that overrides the method.
+<f-note>
+For instance, <a href="https://unpoly.com/up.protocol.config#config.methodParam">unpoly</a> can automatically convert PUT forms into POST forms with an <code>&lt;input name=_method value=PUT&gt;</code> input.
 </f-note>
 
 <pre class="code">
@@ -1153,22 +1154,6 @@ pattern.
 
 <h2>Additional Benefits</h2>
 <div class=notice>Pretty much everything after this is still unfinished</div>
-
-Prior variations on this proposal failed to generate the necessary traction to get implemented,
-which burdens the concept with considerable inertia.<f-note>
-Citation needed.
-</f-note>
-
-Additionally, adopting PUT, PATCH, and DELETE form support today would require nontrivial changes to
-browser navigation, a technically complex challenge.
-
-<p>
-Nevertheless, we believe that this simple (from a UX standpoint) change has transformative
-potential for the web platform, dramatically reducing the compromises required to build web
-applications without scripting. Done properly, the simple addition of three HTTP Methods makes pure
-HTML feasible as an application platform for use-cases where reliability, durability, and security
-are prized.
-
 
 <h3>Simplify Application Servers</h3>
 
