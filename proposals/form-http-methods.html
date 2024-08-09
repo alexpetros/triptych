@@ -711,7 +711,7 @@ The new lifecycle methods would make it possible for those applications to built
 Lacking proper browser support, developers still consider method semantics important enough to their
 API design that they come up with ad-hoc methods to achieve the same result.
 
-<h3>The hidden input hack</h3>
+<h3>The Hidden Input Hack</h3>
 
 <p>
 The most common way that developers compensate for the lack of proper HTTP method support is to
@@ -752,7 +752,7 @@ These points are not new; many of them were made by Mike Amundsen in the closed
   <li>PUT and DELETE do not have the same CORS exemptions that POST does, making them more secure for clients (discussed in <section-ref ref=cors>Section 4.3</section-ref>)
 </ul>
 
-<h3>Ad-hoc URI semantics</h3>
+<h3>Ad-hoc URI Semantics</h3>
 
 <p>
 Another workaround is to encode the method semantics straight into the URI.
@@ -810,7 +810,7 @@ to augment or abandon HTML rather than throw out URI semantics along with them.
 <!-- Without proper method support, -->
 
 
-<h3 id=rest-server-support>REST support in Server Frameworks</h3>
+<h3 id=rest-server-support>REST Support in Server Frameworks</h3>
 
 <p>
 Support for all HTTP methods is widespread in server side frameworks.  Currently, this support is
@@ -963,7 +963,7 @@ for HTTP methods.
 </table>
 
 
-<h3>REST support in client libraries</h3>
+<h3>REST Support in client libraries</h3>
 
 <p>
 Support for all HTTP methods is also widespread in client side frameworks.  Interestingly, this support is
@@ -1153,7 +1153,7 @@ With the addition of the <code>DELETE</code> method, web developers can follow t
 pattern.
 
 <h2>Additional Benefits</h2>
-<div class=notice>Pretty much everything after this is still unfinished</div>
+<div class=notice>This section is unfinished</div>
 
 <h3>Simplify Application Servers</h3>
 
@@ -1165,17 +1165,15 @@ Many server frameworks support it
 
 <h3>Encourage Security Best Practices</h3>
 <p>
-Encourage same-origin (and other security stuff)
+Encourage same-origin, proper URI use
 
 <h3>Encourage Semantic HTML For Future Performance Gains</h3>
-<p>
-Encourage HTML writing
 
 <p>
-Lots of perf gains to be had with better HTTP method use
+Anything written in HTML can be improved over time; moves critical web app functionality into HTML.
 
 <p>
-caching?
+Caching and perf gains to be had with better HTTP method use
 
 <h2>Alternatives and Additions</h2>
 <h3>Omit PATCH</h3>
