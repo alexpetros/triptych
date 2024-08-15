@@ -300,10 +300,12 @@ For same-origin requests, the browser should directly issue the request. For cro
 </ol>
 
 <p>
-The behavior where the browser issues additional CORS requests if the server responds with a redirect is chosen to match the <a href="https://github.com/whatwg/fetch/commit/0d9a4db8bc02251cc9e391543bb3c1322fb882f2">existing behavior in the fetch spec.</a><f-note>
-The <a href="https://fetch.spec.whatwg.org/#general">fetch spec</a> actually goes a bit further and says: <q>for requests that are more involved than what is possible with HTML's form element, a CORS-preflight request is performed, to ensure request’s current URL supports the CORS protocol.</q>
-This part would have to be amended slightly to unpeg CORS from what forms are capable of, since we advocate for extending form capabilities without adding to the <a href="https://fetch.spec.whatwg.org/#cors-safelisted-method">CORS-safelisted methods</a> or <a href="https://fetch.spec.whatwg.org/#cors-safelisted-request-header">CORS-safelisted request headers</a>.
+The behavior where the browser issues additional CORS requests if the server responds with a redirect is chosen to match the <a href="https://github.com/whatwg/fetch/commit/0d9a4db8bc02251cc9e391543bb3c1322fb882f2">existing behavior</a> in the fetch spec.
+<f-note>
+The fetch spec will actually have to be amended slightly to unpeg CORS from forms capabilities, since we advocate for extending form capabilities without adding to the <a href="https://fetch.spec.whatwg.org/#cors-safelisted-method">CORS-safelisted methods</a> or <a href="https://fetch.spec.whatwg.org/#cors-safelisted-request-header">CORS-safelisted request headers</a>.
+Specifically, <a href="https://fetch.spec.whatwg.org/#general">the part</a> that says: <q>for requests that are more involved than what is possible with HTML's form element, a CORS-preflight request is performed, to ensure request’s current URL supports the CORS protocol.</q>
 </f-note>
+
 
 <p>
 Applying CORS to navigation was an implementation blocker for quite some time, as no precedent previously existed for this behavior.<f-note>
@@ -1141,16 +1143,15 @@ delete that reservation.
 With the addition of the <code>DELETE</code> method, web developers can follow the natural, resource-oriented URL
 pattern.
 
-<h2>Additional Benefits</h2>
+<h2>Common Patterns Enabled</h2>
 <div class=notice>This section is unfinished</div>
 
-<h3>Logout: A Specific Example</h3>
+<h3>Logout</h3>
 
 <p>
-Here is a specific example of a common web application pattern that is not well-supported in HTML due to the lack of
-additional HTTP methods beyond <code>GET</code> and <code>POST</code>: a logout flow.  It is common in many web
-applications to have some sort of login functionality, creating a session for a user where their identity
-is established for future requests.
+One common web application pattern that is not well-supported in HTML due to the lack of
+additional HTTP methods beyond GET and POST is a logout flow.
+It is common in many web applications to have some sort of login functionality, creating a session for a user where their identity is established for future requests.
 
 Once a user has logged in, web applications typically allow users to then choose to log out of the web application.
 This is typically done in one of two ways:
@@ -1168,28 +1169,106 @@ Neither of these solutions is ideal, however:
 
 <ul>
   <li>
-    The link-based <code>GET</code> causes a mutation of server state (it deletes the server).  This is in conflict
-    with the intended semantics of <code>GET</code> and  can interact poorly with other features of the web platform
-    such as <a href="https://georgemauer.net/2024/08/01/a-heck-of-a-wild-bug-chase.html">prefetch</a>.
+    The link-based GET causes a mutation of server state (it deletes the session).
+    This is in conflict with the intended semantics of GET and  can interact poorly with other features of the web platform such as <a href="https://georgemauer.net/2024/08/01/a-heck-of-a-wild-bug-chase.html">prefetch</a>.
   </li>
   <li>
-    The form-based <code>POST</code> does not suffer from the above issue, however the logout operation is
-    <em>idempotent</em> and should be safely reloadable, whereas a <code>POST</code> request is not.
+    The form-based POST is more idiomatic, but the logout operation is idempotent and should be safely retryable, whereas a POST request is not.
   </li>
 </ul>
 
-The ideal request for this common piece of functionality would be one that is known to be mutative, but is also
-known to be idempotent.  If HTML were able to issue a <code>DELETE</code> to <code>/session</code> it
-would satisfy both of these needs in a way that it currently cannot, making implementing this extremely common
-functionality less error-prone and more natural.
+Of the two, the POST option is clearly better, but developers nevertheless often use GET because HTML doesn't provide a natural way to describe ending or deleting a resource.<f-note>
+This pattern is so common it was officially supported and <a href="https://docs.djangoproject.com/en/5.0/releases/4.1/#log-out-via-get">only recently deprecated </a>by Django.
+</f-note>
+Left with the need to invent their own semantics, developers frequently choose what's simplest (which is a link).<f-note>
+That you cannot delete a resource with HTML is the primary semantic problem here, but there is a second one: it feels strange to wrap an action like "logout" in a form when you're clearly not submitting a form.
+Writing it as a link feels much more direct.
+We address this limitation in <a href="#">Triptych Proposal #2: Button HTTP Requests</a>.
+</f-note>
 
-<h3>Simplify Application Servers</h3>
+<!-- Neither solution feels natural because they violate REST semantics. If the session is represented by the <code>/session</code>, neither GET or POST correctly describe what we want to do to that session (end it); if the action is described instead by the URI (i.e. POST to <code>/logout</code>) it violates the "action on a resource" vocabulary used elsewhere in the application. -->
 
 <p>
-Let you use routers better
+The ideal request for this common piece of functionality would be one that is known to be mutative, known to be idempotent, and accurately describes the action being taken.
+If HTML were able to issue a <code>DELETE</code> to <code>/session</code> it would these needs in a way that it currently cannot, making implementing this extremely common functionality less error-prone and more natural.
+
+<h3>Application Server Permissions</h3>
 
 <p>
-Many server frameworks support it
+The most popular web frameworks all support the ability to declare handlers for HTTP route and method combos.
+Access to additional methods dramatically simplifies route declaration and remove the potential for footguns.
+
+<p>
+In this example, we'll be using ExpressJS (a popular JavaScript server), and re-using the hotel reservation concept from <section-ref ref=sample-usage>Section 3</section-ref> to show what a server implementation could look like.<f-note>
+We use ExpressJS because it has an especially nice declarative interface for middleware, but the basic concepts can be easily translated to other frameworks like Flask (Python), Spring (Java) and Rails (Ruby).
+</f-note>
+
+<pre class="code">
+router.post(   '/reservation',                   requireLogin,          createReservation)
+router.get(    '/reservation/:reservationId',    requireOwnership, getReservation)
+router.post(   '/reservation/:reservationId',    requireOwnership, updateReservation)
+</pre>
+
+<p>
+Even if you are unfamiliar with ExpressJS, it is relatively easy to understand what is going on here.
+ExpressJS lets you declare a method, a route, and then a series of functions that handle the request.
+To make a reservation, the client issues a POST request to <code>/reservation</code>, then runs the <code>requireLogin</code> function, and if that succeeds, runs the <code>createReservation</code> function.<f-note>
+The indentation servers no purpose other than readability.
+</f-note>
+Viewing and updating a reservation requires it to be <em>your</em> reservation, checked by the <code>requireOwnership</code> method.
+
+<p>
+How then, should we implement the ability to delete a reservation?
+Without access to additional HTML methods in the form, we have two choices.
+We can double-up on a handler:
+
+<pre class="code">
+// Note the new updateOrDeleteReservation method
+router.post(   '/reservation',                   requireLogin,     createReservation)
+router.get(    '/reservation/:reservationId',    requireOwnership, getReservation)
+router.post(   '/reservation/:reservationId',    requireOwnership, updateOrDeleteReservation)
+</pre>
+
+<p>
+No longer does the router, and therefore the network layer, have a complete view of the application's functionality, because deletes and updates happen within the same function.
+If <code>POST /reservations/:reservationId</code> starts throwing internal server errors, it won't be immediately obvious what functionality is impacted.
+
+<p>
+Also, deletes and updates might have different permissions associated with them!
+What if you want to implement group reservations, and give everyone in the group permission to edit the reservation, but only the own permission to delete it?
+The safest, simplest, and most secure way would be to have separate routes with separate permission functions, but since we're re-using one function for two actions, we don't have access to that.
+To accomplish that, we have to mess with the URI:
+
+<pre class="code">
+router.post(   '/reservation',                        requireLogin,             createReservation)
+router.get(    '/reservation/:reservationId',         requireGroupMembership,   getReservation)
+router.post(   '/reservation/:reservationId',         requireGroupMembership,   updateReservation)
+router.post(   '/reservation/:reservationId/delete',  requireOwnership,         deleteReservation)
+</pre>
+
+<p>
+Now we have the ability to declare separate permissions, but we've lost the essential semantic that the URI represents a resource.
+This get messy fast.
+What if reservations have sub-resources, like members?
+It's easy to model that for getting and updating the reservation, because you just add <code>/members</code> to the URI.
+But now we have two confusing cases—one where the sub-resource after the reservation represents a new thing, and one where it represents an action on the main resource.
+This does not scale.
+
+<p>
+The ideal situation is obvious, from the server's standpoint:
+
+<pre class="code">
+router.post(   '/reservation',                        requireLogin,             createReservation)
+router.get(    '/reservation/:reservationId',         requireGroupMembership,   getReservation)
+router.put(    '/reservation/:reservationId',         requireGroupMembership,   updateReservation)
+router.delete( '/reservation/:reservationId',         requireOwnership,         deleteReservation)
+</pre>
+
+<p>
+Each action has a distinct method, permission, and handler.
+The client has access to idempotency semantics now, so the client knows that it's safe to retry the PUT and DELETE requests.
+The network layers can log and track each of the actions at an appropriate level of granularity.
+And most importantly, the purpose of the server is clear and legible to present and future maintainers.
 
 <h3>Encourage Security Best Practices</h3>
 <p>
@@ -1199,6 +1278,8 @@ Encourage same-origin, proper URI use
 
 <p>
 Anything written in HTML can be improved over time; moves critical web app functionality into HTML.
+
+https://stackoverflow.com/a/14587231/15456438
 
 <p>
 Caching and perf gains to be had with better HTTP method use
