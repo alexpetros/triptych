@@ -127,7 +127,7 @@ their reservation:
 
 
 This new form offers the same controls as the POST form, but with some key differences:<f-note>
-The significance of these changes will be discussed more in <section-ref ref=completing-rest>Section 5</section-ref>.
+The significance of these changes will be discussed more in <section-ref ref=completing-rest>Completing REST</section-ref>.
 </f-note>
 
 
@@ -182,7 +182,41 @@ Host: example.com
 And the server could choose to either send a delete confirmation page, or redirect elsewhere.
 
 
-<h2>Additional Considerations</h2>
+<h2>Technical Specification</h2>
+
+<h3>Rendering</h3>
+If the response status code is not a redirection code (300-399), the browser should display the body
+of the response in the page, exactly the same way it would for the response of a POST form.
+It should likewise update the page URL and history.
+
+<h3>Redirection</h3>
+<p>
+For PUT, PATCH, and DELETE requests, if the server responds with a 301, 302, or 307 status code, the browser should perform a subsequent request with the same HTTP method;
+if the server responds with a 303 status code, the browser should perform a subsequent request with the GET method.<f-note>
+When browsers receive a 302 response to a POST form, they typically follow that redirect
+automatically and change the method to GET;
+there is no need for this behavior to apply to PUT, PATCH, and DELETE.
+Changing POST to GET in this fashion is a backwards compatibility carveout in the spec, which has not been applied to other methods in browsers' fetch implementations.
+Using a 303 to perform POST-redirect-GET flow (replacing POST with PUT or DELETE) is already a well-understood pattern for server frameworks that support these methods, so no additional carveouts are needed to integrate with them.
+
+For instance, <a
+  href="https://stackoverflow.com/questions/33214717/why-post-redirects-to-get-and-put-redirects-to-put">ExpressJS</a>
+and <a href="https://stackoverflow.com/questions/71975005/rails-not-redirecting-on-put-request-sending-406-back-instead">Rails</a>.
+</f-note>
+This resolves a blocker for the original Firefox beta implementation.<f-note>
+On 01/12/2011, at 9:57 PM,
+<a href="https://lists.w3.org/Archives/Public/public-html-comments/2011Apr/0000.html">
+Julian Reschke wrote:</a>
+<q>One thing I forgot earlier, and which was the reason why I actually wanted PUT and DELETE
+temporarily (!) on hold is redirect handling. The experimental Firefox implementation was copying
+the redirect handling for POST (with respect to method rewriting), and it would have been bad to let this get into the deployed platform.
+The experimental Firefox implementation was copying the redirect.
+So it would be good to clarify that PUT and DELETE, when being redirected by 301/302 should *not* be rewritten to GET.</q>
+</f-note>
+
+<p>
+If the response redirects to a server of the same origin, the browser should directly issue the request.
+For behavior when the response redirects to a server of a different origin, see <section-ref ref=cors>CORS</section-ref>.
 
 <h3 id=body-content>Body Content</h3>
 
@@ -206,7 +240,7 @@ representing resources the same way.
 </f-note>
 Server frameworks that support PUT and PATCH handle their bodies identically to POST bodies;
 the vast majority of servers will support the new feature out of the gate.<f-note>
-For examples, see <section-ref ref="rest-server-support">Section 6.3</section-ref>
+For examples, see <section-ref ref="rest-server-support">REST Support in Server Frameworks</section-ref>
 </f-note>
 
 <p>
@@ -247,63 +281,88 @@ PUT and DELETE responses are never cacheable.<f-note>
 <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.5-7">Section 9.3.5</a>
 </f-note>
 
+<h3 id=cors>Cross-Origin Resource Sharing (CORS)</h3>
+<p>
+For same-origin requests, the browser should directly issue the request. For cross-origin requests, the browser should do the following:
 
-
-<h3 id=cors>CORS</h3>
+<ol>
+  <li>Issue a CORS preflight request to the URI at the <code>method</code> attribute.</li>
+  <li>If the server responds indicating that the request is not allowed, throw an error (visible to the user, in the same manner as an infinite redirect or bad certificate)</li>
+  <li>Otherwise, issue the request.</li>
+  <li>If the server responds with a redirect, issue a new CORS request
+    <ol>
+      <li>If the server responds indicating that the request is allowed, navigate to the page</li>
+      <li>If the server responds indicating that the request is not allowed, throw an error</li>
+      <li>If the server responds with a redirect, go to step 4</li>
+    </ol>
+  </li>
+  <li>Otherwise, navigate to the page
+</ol>
 
 <p>
-In the interest of limiting the scope of the proposal, browsers should, to start, only support PUT, PATCH, and DELETE forms that are making same-origin requests.
-
-<h4>Background</h4>
-
-<p>
-A cross-origin request is when a webpage at one origin (typically, this means a domain) attempts to request a resource from a different origin.
-Modern browsers block most cross-origin requests by default, as a security feature.
-Among other benefits, blocking cross-origin requests significantly mitigates the attack surface for malicious websites to take unwanted actions against other servers on the user's behalf—in particular via Cross-Site Request Forgery (CSRF).
-
-<p>
-There are, however, instances in which servers want to explicitly opt-in to cross-origin requests.
-Cross-Origin Resource Sharing (CORS) is a header-based mechanism that allows them to do so.
-When a website makes a request to a server with a different origin than its own, the browser will, in most cases, send a "preflight request" to ask that server to what extent it permits loading its resources on other pages.
-
-<p>
-HTML forms predate CORS, so CORS contains a number of exceptions to the same-origin policy, designed to keep from breaking existing web forms while still moving web security forward.
-The browser will not send a preflight request to cross-origin servers (it'll just make the request directly) if the request falls within certain confines—essentially the confines of what HTML forms were capable of prior to the specification of CORS.<f-note>
+The behavior where the browser issues additional CORS requests if the server responds with a redirect is chosen to match the <a href="https://github.com/whatwg/fetch/commit/0d9a4db8bc02251cc9e391543bb3c1322fb882f2">existing behavior in the fetch spec.</a><f-note>
 The <a href="https://fetch.spec.whatwg.org/#general">fetch spec</a> actually goes a bit further and says: <q>for requests that are more involved than what is possible with HTML's form element, a CORS-preflight request is performed, to ensure request’s current URL supports the CORS protocol.</q>
 This part would have to be amended slightly to unpeg CORS from what forms are capable of, since we advocate for extending form capabilities without adding to the <a href="https://fetch.spec.whatwg.org/#cors-safelisted-method">CORS-safelisted methods</a> or <a href="https://fetch.spec.whatwg.org/#cors-safelisted-request-header">CORS-safelisted request headers</a>.
 </f-note>
 
 <p>
-Therefore, expanding the scope of what is possible through the HTML form element also requires reckoning with how that impacts the scope of what is possible without a CORS pre-flight request.
-
-<!-- GET, HEAD, and POST requests that -->
-
-<h4>Recommendation</h4>
-
-<p>
-The browser should disallow cross-origin PUT, PATCH, and DELETE forms, logging the error to the console.
-This minimizes implementation complexity as much as possible while still meeting the proposal's goals of incentivizing same-origin RESTful application development by making it the simplest way to build an interactive web service.
-
-<!-- <p> -->
-<!-- The motivation for including PUT, PATCH, and DELETE support in HTML forms is to make safe, secure, same-origin RESTful application development as easy as possible. -->
-
-<!-- Explicitly omitting CORS support from this proposal reduces the implementation complexity for browser vendors, solves the majority use-case, and leaves the door open for CORS support later, vendor interest permitting. -->
-
-<p>
-First and foremost, new browser features must not expose existing servers or users to new vulnerabilities, so adding new CORS-safelisted methods or headers is out of the question.<f-note>
-<a href="https://github.com/whatwg/html/issues/3577#issuecomment-625880214">@annevk on issue #3577</a> <q>the same-origin policy cannot be extended further as that would put servers at risk.</q>
+Applying CORS to navigation was an implementation blocker for quite some time, as no precedent previously existed for this behavior.<f-note>
+<a href="https://github.com/whatwg/html/issues/3577#issuecomment-625375374">@annevk on issue #3577</a> <q>We cannot bypass the same-origin policy and enforcing CORS is theoretically possible, but would require integration of that to some extent with navigation, which is completely new ground.</q>
 </f-note>
+Progress in Private Network Access draft specification, however, has provided a concurrent justification for revisiting it.<f-note>
+We refer specifically to its <a href="https://wicg.github.io/private-network-access/#example-deny-by-default">application of CORS to link navigation.</a>
+</f-note>
+As such, this proposal models its algorithm to re-use the work from that proposal and reduce implementation complexity accordingly.
+
+<p>
+It's possible that new, navigation-specific CORS headers could be added as well.
+
+<h3>Refresh Behavior</h3>
+<p>
+For PATCH requests, which are not idempotent, the user agent should behave as it does currently, asking the user for confirmation and warning that it may cause the data to be re-submitted.
+
+<p>
+For PUT and DELETE requests, which are idempotent, the user agent should resubmit the request.
+This allows servers to take advantage of the method semantics and create forms that users on unreliable connections can feel confident re-submitting.
+
+<h2>Security Profile</h2>
+<h3>Client Capabilities</h3>
+<p>
+First and foremost, new browser features must not expose existing servers or users to new vulnerabilities, so adding new CORS-safelisted methods or headers is out of the question.
 Fortunately, there is no need to do so.
 
 <p>
-PUT, PATCH, and DELETE forms simply make available to HTML a highly useful subset of what is <em>already available</em> to the web page, via JavaScript.
-JavaScript is capable of making single-origin and cross-origin PUT requests; we propose that HTML be capable of making single-origin requests, which does not extend the median browsers' capabilities at all.<f-note>
-The word "median" is used here to acknowledge that, technically, this does make new HTTP methods available to browsers which have scripting disabled.
-The overwhelming majority of browser users, especially the ones most vulnerable to malicious websites, do not having scripting disabled, and the methods we propose adding are more secure than the POST method that is already available.
-</f-note>
+PUT, PATCH, and DELETE forms only make available to HTML a highly useful subset of what is <em>already available</em> to the web page, via JavaScript.
+Nothing is proposed that can't be accomplished currently with <code>fetch</code> and <code>FormData</code>.
 
 <p>
-Moreover, the addition of CORS-restricted methods to HTML forms provides a massive opportunity to move developers onto a more secure pattern web applications.
+Technically, this does increase the capabilities of clients that that have scripting disabled.
+The overwhelming majority of browser users, however, especially the ones most vulnerable to malicious websites, have scripting enabled.
+Servers obviously cannot build webpages that are only secure for users with scripting disabled, so this does not change the security profile of the server.
+
+<p>
+The only HTML control that this proposal alters is the form's <code>method</code> attribute.
+Because the only two supported methods, GET and POST, have such different purposes, it is highly unlikely that authors are setting this attribute dynamically; it is even less likely that authors are setting it dynamically with un-escaped user-generated input, and relying on the browser's incomplete implementation of HTTP methods to protect against XSRF.
+The spec has never guaranteed that these would be the only two methods, and it's hard to imagine a practical use that would lead an author to that implementation.
+
+<!-- <h3>Form Security Background</h3> -->
+<!-- <p> -->
+<!-- HTML forms predate CORS, so CORS contains a number of exceptions to the same-origin policy, designed to keep from breaking existing web forms while still moving web security forward. -->
+<!-- The browser will not send a preflight request to cross-origin servers (it'll just make the request directly) if the request falls within certain confines—essentially the confines of what HTML forms were capable of prior to the specification of CORS. -->
+
+<!-- <p> -->
+<!-- A cross-origin request is when a webpage at one origin (typically, this means a domain) attempts to request a resource from a different origin. -->
+<!-- Modern browsers block most cross-origin requests by default, as a security feature. -->
+<!-- Among other benefits, blocking cross-origin requests significantly mitigates the attack surface for malicious websites to take unwanted actions against other servers on the user's behalf—in particular via Cross-Site Request Forgery (CSRF). -->
+
+<!-- <p> -->
+<!-- There are, however, instances in which servers want to explicitly opt-in to cross-origin requests. -->
+<!-- Cross-Origin Resource Sharing (CORS) is a header-based mechanism that allows them to do so. -->
+<!-- When a website makes a request to a server with a different origin than its own, the browser will, in most cases, send a "preflight request" to ask that server to what extent it permits loading its resources on other pages. -->
+
+<h3>Opportunity For a Pit of Success</h3>
+<p>
+The addition of CORS-restricted methods to HTML forms provides a massive opportunity to move developers onto a more secure pattern web applications.
 PUT, PATCH, and DELETE requests are more secure, by default, than POST requests, because they will <em>never</em> be issued to a cross-origin server unless that server explicitly permits them.<f-note>
 This is another, highly significant, reason not to tunnel PUT and DELETE through POST requests with ad-hoc semantics, one that did not exist when Amundsen et. al were arguing for PUT and DELETE support in
 <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c4">WHATWG Bug 10671</a>.
@@ -327,7 +386,7 @@ Sites that use REST verbs properly are easier to secure than sites that don't.<f
 The <a href="https://developer.mozilla.org/en-US/docs/Glossary/CSRF">MDN Page for CSRF</a> ends with this note: <q>There are many ways to prevent CSRF, such as implementing [sic] RESTful API, adding secure tokens, etc.</q>
 Unfortunately, it doesn't describe how a RESTful API might mitigate CSRF.
 What they likely mean by this is that ensuring GET requests do not have side effects mitigates a number of CSRF pathways, but it's also true that HTML does not does not properly support RESTful APIs, nor does it currently have the ability to make any unsafe HTTP requests that are fully protected by CORS.
-For more on the importance of supporting REST and the ways in which HTML support is inadequate, see <section-ref ref=completing-rest>Section 5</section-ref>.
+For more on the importance of supporting REST and the ways in which HTML support is inadequate, see <section-ref ref=completing-rest>Completing REST</section-ref>.
 </f-note>
 Web forms that make using REST verbs trivial for same-site requests—especially REST verbs that are not safelisted by CORS—incentivize the simplest, most secure patterns by also making them the easiest to implement.
 
@@ -335,58 +394,7 @@ Web forms that make using REST verbs trivial for same-site requests—especially
 <!-- CORS is a mechanism for lifting the browser's security guarantees; rather than lift them, developers should be provided a path of least resistance to comply with them. -->
 <!-- </f-note> -->
 
-<h3>Navigation</h3>
-<h4>Rendering</h4>
-If the response status code is not a redirection code (300-399), the browser should display the body
-of the response in the page, exactly the same way it would for the response of a POST form.
-It should likewise update the page URL and history.
-
-<h4>Redirection</h4>
-<p>
-For PUT, PATCH, and DELETE requests, if the server responds with a 301, 302, or 307 status code, the browser should perform a subsequent request with the same HTTP method;
-if the server responds with a 303 status code, the browser should perform a subsequent request with the GET method.<f-note>
-When browsers receive a 302 response to a POST form, they typically follow that redirect
-automatically and change the method to GET;
-there is no need for this behavior to apply to PUT, PATCH, and DELETE.
-Changing POST to GET in this fashion is a backwards compatibility carveout in the spec, which has not been applied to other methods in browsers' fetch implementations.
-Using a 303 to perform POST-redirect-GET flow (replacing POST with PUT or DELETE) is already a well-understood pattern for server frameworks that support these methods, so no additional carveouts are needed to integrate with them.
-
-For instance, <a
-  href="https://stackoverflow.com/questions/33214717/why-post-redirects-to-get-and-put-redirects-to-put">ExpressJS</a>
-and <a href="https://stackoverflow.com/questions/71975005/rails-not-redirecting-on-put-request-sending-406-back-instead">Rails</a>.
-</f-note>
-
-<p>
-The browser should only follow redirects to servers of the same origin.<f-note>
-For more on potential future CORS support, see <section-ref ref=alternative-cors-support>Section 8.2</section-ref>
-</f-note>
-If the server responds to any of the new methods with a redirect to a server of a different origin, the browser should display an error indicating that the server tried to redirect the page in a manner that is unsupported at this time.<f-note>
-The navigation flow we propose here is one in which the browser "quietly" fails to execute an explicit cross-origin request (simply logging to the console and taking no further action), but "loudly" fails to execute a cross-origin redirect, in a similar manner to how the browser will display a full-screen error for an infinite redirect or an expired TLS certificate.
-
-<br><br>
-This is a compromise between the way the browser handles JavaScript-based CORS failures (quietly) and how the browser generally handles navigation failures (loudly). Other options are available depending on the recommendations on editors and implementers.
-</f-note>
-
-
-<p>
-This resolves a blocker for the original Firefox beta implementation.<f-note>
-On 01/12/2011, at 9:57 PM,
-<a href="https://lists.w3.org/Archives/Public/public-html-comments/2011Apr/0000.html">
-Julian Reschke wrote:</a>
-<q>One thing I forgot earlier, and which was the reason why I actually wanted PUT and DELETE
-temporarily (!) on hold is redirect handling. The experimental Firefox implementation was copying
-the redirect handling for POST (with respect to method rewriting), and it would have been bad to let this get into the deployed platform.
-The experimental Firefox implementation was copying the redirect.
-So it would be good to clarify that PUT and DELETE, when being redirected by 301/302 should *not* be rewritten to GET.</q>
-</f-note>
-
-<h4>Refresh Button</h4>
-<p>
-For PATCH requests, which are not idempotent, the user agent should behave as it does currently, asking the user for confirmation and warning that it may cause the data to be re-submitted.
-
-<p>
-For PUT and DELETE requests, which are idempotent, the user agent should resubmit the request.
-This allows servers to take advantage of the method semantics and create forms that users on unreliable connections can feel confident re-submitting.
+<!-- GET, HEAD, and POST requests that -->
 
 <h2 id=completing-rest>Completing REST</h2>
 In 2000, Roy Fielding published a PhD dissertation in which he introduced the Representational State
@@ -424,7 +432,7 @@ His main concern is that the name of the method should not affect the parsing of
 that would require out-of-band agreement on method semantics and limit the extensibility of the
 method field.<f-note>
 <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_3_1_2">
-  Section 6.3.1.2
+  Section 7.3.1.2
 </a>
 </f-note>
 
@@ -575,7 +583,7 @@ The usefulness of methods as an HTTP semantic—<i>a priori</i> to the semantics
 themselves—is so self-evident that the hypertext transfer protocol has long standardized a bunch of
 additional methods; all that remains is for the dominant hypertext markup to support them.<f-note>
 The purpose of describing REST in this detail, and the "REST in Practice" subsection in particular,
-is to make clear that REST is not an ivory tower architecture that developers have failed to follow; it's an attempt to explain the best real-world developer practices and model the ways in which user agents can support them. The lack of proper method support is a <a href="https://www.w3.org/TR/html-design-principles/#solve-real-problems">real problem</a> that developers continually work around. For evidence of this, see <section-ref ref=ecosystem-demand>Section 6: Ecosystem Demand</section-ref>.
+is to make clear that REST is not an ivory tower architecture that developers have failed to follow; it's an attempt to explain the best real-world developer practices and model the ways in which user agents can support them. The lack of proper method support is a <a href="https://www.w3.org/TR/html-design-principles/#solve-real-problems">real problem</a> that developers continually work around. For evidence of this, see <section-ref ref=ecosystem-demand>Ecosystem Demand</section-ref>.
 </f-note>
 
 <h3>The Limits of Scripting</h3>
@@ -745,7 +753,7 @@ These points are not new; many of them were made by Mike Amundsen in the closed
   <li>HTTP methods are typically logged while HTTP bodies are not; services that break up their unsafe requests across POST, PUT, and DELETE have a smaller surface to debug than ones where all unsafe request are tunneled through POST.
   <li>HTTP methods are a powerful filtering tool for debugging across the stack—server logs, application logs, and the browser network tab.
   <li>Routing is fundamental to server logic, and including an additional variable for routing dramatically simplifies the server logic that would otherwise have to compensate by performing additional routing imperatively.
-  <li>PUT and DELETE do not have the same CORS exemptions that POST does, making them more secure for user agent (discussed in <section-ref ref=cors>Section 4.3</section-ref>)
+  <li>PUT and DELETE do not have the same CORS exemptions that POST does, making them more secure for user agent (discussed in <section-ref ref=cors>CORS</section-ref>)
 </ul>
 
 <h3>Ad-hoc URI Semantics</h3>
@@ -1202,21 +1210,6 @@ PUT and DELETE are necessary to include a full CRUD grammar in HTML; PATCH is no
 
 <p>
 If you are going to do the work to generalize the <code>&lt;/form&gt;</code> method attribute anyway, it doesn't seem like there's huge benefit to omitting PATCH. Nevertheless, the proposal could mostly success in its goals without PATCH, since most RESTful design practices focus on PUT and DELETE.
-
-<h3 id=alternative-cors-support>Include CORS Support</h3>
-<p>
-Between supporting a same-origin mode for form navigation versus implementing CORS for form navigation, spec editors have indicated that the former is the less-difficult option.<f-note>
-<a href="https://github.com/whatwg/html/issues/3577#issuecomment-625880214">@annevk:</a>
-<q>Same-origin is probably less work than CORS, but it's still a lot of work.</q>
-</f-note>
-In the interest of minimizing the barriers to implementation, we recommend starting with a same-origin mode—which still leaves the door open to CORS support in the future.
-
-<p>
-If, however, implementers were interested in supporting cross-origin PUT, PATCH, and DELETE requests right out of the gate, we would have no objection. After all, the fetch spec supports CORS for these methods, there's no reason HTML shouldn't.
-
-<p>
-If and when CORS support is eventually added, a redirect to a cross-origin server should trigger a preflight request to that new server, <a href="https://github.com/whatwg/fetch/commit/0d9a4db8bc02251cc9e391543bb3c1322fb882f2">to match the spec</a>, and cancel navigation with an error if the new server does not respond with the appropriate CORS headers.
-It's possible that new, navigation-specific CORS headers could be added as well.
 
 <h3>Allow for DELETE request bodies</h3>
 <p>
