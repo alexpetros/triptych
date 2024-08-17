@@ -1,12 +1,12 @@
 # Triptych - New Attributes for HTML
 
-Triptych is a polyfill for three small HTML proposals:
+[Triptych](https://alexanderpetros.com/triptych/) is a polyfill for three small HTML proposals:
 
-- Support PUT, PATCH, and DELETE on forms
-- Enable buttons to make HTTP requests without being wrapped in forms
-- Enable links, forms, and buttons to target a part of the DOM for replacement
+1. Support PUT, PATCH, and DELETE on forms ([proposal](https://alexanderpetros.com/triptych/form-http-methods))
+2. Enable buttons to make HTTP requests without being wrapped in forms
+3. Enable links, forms, and buttons to target a part of the DOM for replacement
 
-Work on these proposals is in progress, and I'll link them here when they're up.
+Work on these proposals is in progress: we've put out the first one and the next two are coming soon.
 If you're interested in working on that, reach out to me!
 
 ## Examples
