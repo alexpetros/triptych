@@ -14,11 +14,11 @@
     Carson Gross (<a href="mailto:carson@bigsky.software">carson@bigsky.software</a>)
   </dd>
   <dt>Date Created</dt>
-  <dd>August xx, 2024
+  <dd>August 16, 2024
   <dt>Last Updated</dt>
-  <dd>August xx, 2024
+  <dd>August 16, 2024
   <dt>Status</dt>
-  <dd style="color: red;">Unpublished</dd>
+  <dd>Published</dd>
 
 </dl>
 
@@ -35,7 +35,7 @@
 A proposal for adding PUT, PATCH, and DELETE support to HTML forms.
 
 <p>
-Proposal 1/3 in the <a href=/triptych>Triptych Proposals</a>.
+Proposal 1/3 in the <a href="https://alexanderpetros.com/triptych/">Triptych Proposals</a>.
 
 <h3>Goals</h3>
 <p>
@@ -43,7 +43,7 @@ PUT, PATCH, and DELETE support in forms should:
 
 <ul>
   <li>be the path of least friction for developing RESTful web services
-  <li>integrate seamlessly with existing form semantics
+  <li>fit seamlessly within existing form semantics
   <li>integrate with existing servers and frameworks that support those methods
   <li>not introduce new security considerations
 </ul>
@@ -347,21 +347,6 @@ The only HTML control that this proposal alters is the form's <code>method</code
 Because the only two supported methods, GET and POST, have such different purposes, it is highly unlikely that authors are setting this attribute dynamically; it is even less likely that authors are setting it dynamically with un-escaped user-generated input, and relying on the browser's incomplete implementation of HTTP methods to protect against XSRF.
 The spec has never guaranteed that these would be the only two methods, and it's hard to imagine a practical use that would lead an author to that implementation.
 
-<!-- <h3>Form Security Background</h3> -->
-<!-- <p> -->
-<!-- HTML forms predate CORS, so CORS contains a number of exceptions to the same-origin policy, designed to keep from breaking existing web forms while still moving web security forward. -->
-<!-- The browser will not send a preflight request to cross-origin servers (it'll just make the request directly) if the request falls within certain confines—essentially the confines of what HTML forms were capable of prior to the specification of CORS. -->
-
-<!-- <p> -->
-<!-- A cross-origin request is when a webpage at one origin (typically, this means a domain) attempts to request a resource from a different origin. -->
-<!-- Modern browsers block most cross-origin requests by default, as a security feature. -->
-<!-- Among other benefits, blocking cross-origin requests significantly mitigates the attack surface for malicious websites to take unwanted actions against other servers on the user's behalf—in particular via Cross-Site Request Forgery (CSRF). -->
-
-<!-- <p> -->
-<!-- There are, however, instances in which servers want to explicitly opt-in to cross-origin requests. -->
-<!-- Cross-Origin Resource Sharing (CORS) is a header-based mechanism that allows them to do so. -->
-<!-- When a website makes a request to a server with a different origin than its own, the browser will, in most cases, send a "preflight request" to ask that server to what extent it permits loading its resources on other pages. -->
-
 <h3>Opportunity For a Pit of Success</h3>
 <p>
 The addition of CORS-restricted methods to HTML forms provides a massive opportunity to move developers onto a more secure pattern web applications.
@@ -392,11 +377,6 @@ For more on the importance of supporting REST and the ways in which HTML support
 </f-note>
 Web forms that make using REST verbs trivial for same-site requests—especially REST verbs that are not safelisted by CORS—incentivize the simplest, most secure patterns by also making them the easiest to implement.
 
-<!-- <f-note> -->
-<!-- CORS is a mechanism for lifting the browser's security guarantees; rather than lift them, developers should be provided a path of least resistance to comply with them. -->
-<!-- </f-note> -->
-
-<!-- GET, HEAD, and POST requests that -->
 
 <h2 id=completing-rest>Completing REST</h2>
 In 2000, Roy Fielding published a PhD dissertation in which he introduced the Representational State
@@ -408,13 +388,9 @@ Roy Fielding is less polite: in <a href="https://roy.gbiv.com/untangled/2008/res
 </f-note>
 
 <p>
-Despite the misconceptions, REST remains the most powerful conceptual tool for building durable
-hypermedia applications.
-In this section, we make the case for how better method support in HTML can drive adoption of REST
-priciples and dramatically improve the median web application as a result.
+Despite the misconceptions, REST remains the most powerful conceptual tool for building durable hypermedia applications.
+In this section, we make the case for how better method support in HTML can drive adoption of REST priciples and dramatically improve the median web application as a result.
 
-<!-- This explanation draws on his references to it in his , and Carson Gross' <a href="https://htmx.org/essays/hateoas/">"alternative -->
-<!-- explanation"</a> of the term. -->
 <h3>REST in Theory</h3>
 
 <p>
@@ -485,14 +461,6 @@ If HTML allowed the use of arbitrary HTTP methods, developers could pilot new cl
 Of course, the implications of this are wide-ranging and far exceed the scope of this proposal.
 </f-note>
 Instead, we simply urge that HTML support the relevant, existing HTTP methods, which are so useful that they are universally-supported by servers in spite of their absence from the HTML standard.
-
-<!-- https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_3_1_2 -->
-
-<!-- <p> -->
-<!-- By presenting the user with both the current application state (the form values) and possible -->
-<!-- actions on that state (the input types and submit button), HTML is able to fulfill its duty as a -->
-<!-- uniform interface. -->
-
 
 <h3>REST in Practice</h3>
 
@@ -608,12 +576,6 @@ Among the <a href="https://unplannedobsolescence.com/blog/hard-page-load/">many 
 </f-note>
 
 
-<!-- <f-note> -->
-<!-- While an old directory of HTML files will almost certainly be easier to deploy than an old NodeJS project, many "dynamic" architectures are closer to the former than the latter. -->
-<!-- For instance, vanilla PHP can be written and deployed in almost exactly the same manner as HTML files. -->
-<!-- See also: <a href="https://blog.wesleyac.com/posts/no-static-websites"><cite class=article><a href="https://blog.wesleyac.com/posts/no-static-websites">There is no such thing as a static website</cite></a>There is no such thing as a static website</a> -->
-<!-- </f-note> -->
-
 <p>
 Given HTML's tremendous backwards- and forwards-compatibility guarantees, its capabilities guide the design of durable interactive applications.
 For instance, the vast majority of Wikipedia's functionality can be described with hypertext primitives—including its relatively limited interactivity.<f-note>
@@ -624,93 +586,8 @@ Not only can you browse Wikipedia with JavaScript disabled, you can create an ac
 with scripting enabled, editing is augmented by a rich-text editor, but in most other respects the experience is close to identical.
 
 <p>
-Many applications that thrive on the web have ore complicated resource lifecycles than Wikipedia, like banking, travel bookings, and social media.
+Many applications that thrive on the web have more complicated resource lifecycles than Wikipedia, like banking, travel bookings, and social media.
 The new lifecycle methods would make it possible for those applications to built their interactivity in a hypertext-driven style, and take full advantage of the browser's reliability, security, and longevity as an application platform.
-
-<!-- The web is already one of, if not the most the essential telecommunications platform of the 21st century. -->
-<!-- Making HTML the easiest, cheapest, and most dependable base for building distributed systems -->
-<!-- would cement the web as the dominant infrastructure platform for essential services, where -->
-<!-- reliability and accessibility are prized above all else. -->
-
-
-
-
-<!-- <p> -->
-<!-- Scripting is a great way to augment the web platform, but it is a bad basis for durable applications. -->
-<!-- Many once-widespread browser extensions, like Java Applets and Adobe Flash, are no longer supported at all.<f-note> -->
-<!-- Java Applets were <a href="https://openjdk.org/jeps/289">deprecated in 2017</a>. -->
-<!-- Adobe Flash, once a dominant method for creating and distributing interactive web media, was blocked from transitioning to the mobile web, discontinued in 2017. -->
-<!-- Microsoft Silverlight, which powered the early days of Netflix's web streaming platform, was discontinued in 2021. -->
-<!-- <br><br> -->
-<!-- While all these code-on-demand extensions helped push the web platform forward, much of their functionality was eventually adopted into the standard, and web content from organizations that didn't have the resources to migrate it is now very hard to access. -->
-<!-- The breadth and <a href="https://edition.cnn.com/2021/09/10/tech/digital-news-coverage-9-11/">historical significance</a> of Flash-based web content, in particular, has spurred heroic efforts to preserve them, including the open-source flash emulator, <a href="https://ruffle.rs/">ruffle</a>, which is available for all major browsers. -->
-<!-- </f-note> -->
-<!-- JavaScript is a permanent part of the web platform, but today many JS-based websites are "built" with compilers and non-standard file formats—maintaining these requires constant updates to the build stack.<f-note> -->
-<!-- If the compiler updates in a way that breaks your build, you can continue to run an old version of the compiler, but the feature set that your application has to work with freezes. -->
-<!-- Either the maintainers have to commit to a potentially costly refactor, or continue to maintain their application with an increasingly out-of-date architecture. -->
-<!-- This is never happens to HTML-forward applications, which can always take advantage of additions  to HTML's living standard without being forced to migrate old code. See also: <a href="https://htmx.org/essays/no-build-step/"><cite class=article>Why htmx Does Not Have a Build Step</cite></a>. -->
-<!-- </f-note> -->
-<!-- Even websites that load JS directly into the browser run the risk that their website's functionality is too intricately tied to the framework chosen, and they'll be stuck with a lot of code written around an interface that is no longer actively supported. -->
-
-<!-- <p> -->
-<!-- Meanwhile, HTML has possibly the strictest backwards and forwards compatibility guarantees in software. -->
-<!-- HTML documents from the earliest days of the web run perfectly on the web browsers in your smartphone.<f-note> -->
-<!-- This includes everything from a <a href="https://first-website.web.cern.ch/first-website/node/24.html">1991 hypertext demo</a>, <a href="http://info.cern.ch/hypertext/WWW/TheProject.html">the very first web page</a>, and The Washington Post's <a href="https://www.washingtonpost.com/wp-srv/inatl/longterm/diana/dianastories.htm">special edition home page commemorating Princess Diana.</a> -->
-<!-- Very little 20<sup>th</sup> century software can be run that easily on modern devices. -->
-<!-- </f-note> -->
-<!-- People who author an HTML file today can feel more confident that it will be faithfully rendered and easy to read as long as browser remain relevant. -->
-
-<!-- because REST is software design on the scale of decades.<f-note> -->
-<!-- From <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-724">"Rest APIs Must be Hypertext Driven," Comment #8</a>: -->
-<!-- <q>REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution. -->
-<!-- Many of the constraints are directly opposed to short-term efficiency. [...] -->
-<!-- There are more than a few software methodologies that portray any long-term thinking as wrong-headed, ivory tower design (which it can be if it isn't motivated by real requirements).</q> -->
-<!-- </f-note> -->
-
-
-<!-- Authors for whom proper REST support is a priority will not have to automatically resort to scripting, and authors who have no conception of REST, but are starting with HTML as the easiest way to build a client, will be guided towards REST by ease of use.<f-note> -->
-<!-- Consider the cliched "to-do app" that is often the goal of beginner web tutorials. -->
-<!-- After implementing and experimenting with note creation, a beginner developer will ask themselves <q>well, how do I delete these?</q> -->
-<!-- The simplest, lowest-effort path to a delete button is going to be re-using the same route, but with a DELETE method—and all that has to be done on the client is add a new form with the same <code>action</code> and a new <code>method</code>. -->
-<!-- </f-note> -->
-<!-- In both cases, the benefit of being RESTful isn't that that it confirms to abstract theoretical purity—it's using a set of technologies that are built to last. -->
-
-<!-- <p> -->
-<!-- We argue that HTML's inability to express RESTful application patterns is preventing developers from taking advantage of the web platform's marquee feature: its longevity. -->
-
-<!-- <p> -->
-<!-- Finally, broadening the available form methods not only simplifies the client—it makes it possible to describe the "backend" of the application in a way that makes the server more fungible as well. -->
-<!-- A wide variety of languages and server frameworks have support for declaring routes and methods; the task of switching between them, if such becomes necessary, becomes easier the more the application can be described at that high level of abstraction. -->
-
-<!-- <p> -->
-<!-- In 2008, Fielding writes: -->
-
-<!-- <blockquote> -->
-<!-- Many of the constraints are directly opposed to short-term efficiency. [...] -->
-<!-- There are more than a few software methodologies that portray any long-term thinking as wrong-headed, ivory tower design (which it can be if it isn't motivated by real requirements).<f-note> -->
-<!-- <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven#comment-724">"Rest APIs Must be Hypertext Driven," Comment #8</a> -->
-<!-- </f-note> -->
-<!-- </blockquote> -->
-
-<!-- <p> -->
-<!-- With decades of practice, we have access to information that Fielding did not when he was describing the nascent web, namely, that the longevity of a service is directly correlated with the degree to which is able to represent itself without augmenting the hypertext; on the web, a service whose functionality can be built with mostly HTML is likely to last longer than one that relies more on JavaScript. -->
-
-<!-- <p> -->
-<!-- Included in the REST architectural style is the "optional constraint" of code-on-demand: client functionality can be extended by downloading and executing code in the form of applets or scripts. -->
-<!-- As an example, Fielding describes an organization that wants to run Java Applets from internal sources, but disables untrusted, external Applets.<f-note> -->
-<!-- https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm#sec_5_1_7 -->
-<!-- </f-note> -->
-
-<!-- <f-note> -->
-<!-- Although hypermedia representations are a core tenet of REST, relatively little is said in the thesis about the necessary qualities of that hypermedia representation. Chapter 6 contains sections on <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_2">"Rest Applied to URI"</a> and <a href="https://ics.uci.edu/~fielding/pubs/dissertation/evaluation.htm#sec_6_3">"REST Applied to HTTP"</a> but not "REST Applied to HTML." -->
-<!-- </f-note> -->
-
-<!-- <p> -->
-<!-- If REST is so cumbersome to implement in HTML, what if the fault lies not with HTML, but with REST. -->
-<!-- Perhaps REST served as a useful guideline for the early days of the web, but is no longer up to the demands of modern web applications? -->
-<!-- This is not so. -->
-
-<!-- One of these software systems is the World Wide Web itself, which REST was designed to describe and direct. Despite fierce competition from desktop and mobile applications, the web remains arguably the dominant platform for application development today. But -->
 
 <h2 id=ecosystem-demand>Ecosystem Demand</h2>
 
@@ -777,19 +654,19 @@ Another workaround is to encode the method semantics straight into the URI.
 
 
 <p>
-This actually resolves some of the operational issues with the hidden input hack. The different
-actions are visible to the transport layer (although in a slightly harder-to-parse location than the
-proper method field), and server routers can easily declare separate handlers for each action.
+This actually resolves some of the operational issues with the hidden input hack.
+The different actions are visible to the transport layer (although in a slightly harder-to-parse location than the proper method field), and server routers can easily declare separate handlers for each action.
 
 <p>
-But it is certainly not REST. In fact, it regresses on the Richardson Maturity Model from even the
-hidden input hack, all the way back down to 0.
-Where the hidden input at least used URIs to identify resources, now the URIs don't even represent
-resources anymore; they represent a combination of resource and method, mixing the
-semantics of both.
+But it is certainly not REST. In fact, it regresses on the Richardson Maturity Model from even the hidden input hack, all the way back down to 0.
+Where the hidden input at least used URIs to identify resources, now the URIs don't even represent resources anymore;
+they represent a combination of resource and method, mixing the semantics of both.
+The problem immediately becomes apparent when you try to add additional sub-resources after <code>/users/123</code>:
+sometimes what comes after the <code>123</code> is an action, and sometimes it's a sub-resource.
+This is a hassle to code, and it's a hassle to understand.
 
 <p>
-In addition to minor inconveniences like making it more cumbersome to filter logs, the greater impact of this is to unmoor the application from any universal semantics.
+The overall impact is to unmoor the application from any universal semantics.
 The standardized HTTP methods guide the developer to a clear and consistent pattern.
 If the developer is not presented with a consistent set of common verbs for common tasks, they are liable to invent their own.
 Why shouldn't <code>/put</code> be <code>/create</code>, or <code>/delete</code> be <code>/remove</code>?<f-note>
@@ -799,6 +676,7 @@ When extensions like these are tried out in the method slot, the user agent can 
 fallback to a baseline behavior if they are not.
 Of course, HTTP <em>already</em> has features that differentiate GET, POST, PUT, and DELETE, so the question of whether browsers might build features around those is not theoretical—they already do.
 </f-note>
+
 
 <p>
 The obvious smell of this pattern, when placed next to the actual HTTP methods, leads developers to conclude, correctly, that the missing methods limitation is endogenous to HTML, and the solution is to augment or abandon HTML rather than throw out URI semantics along with them.
@@ -1143,8 +1021,7 @@ delete that reservation.
 With the addition of the <code>DELETE</code> method, web developers can follow the natural, resource-oriented URL
 pattern.
 
-<h2>Common Patterns Enabled</h2>
-<div class=notice>This section is unfinished</div>
+<h2>Common Patterns</h2>
 
 <h3>Logout</h3>
 
@@ -1170,7 +1047,10 @@ Neither of these solutions is ideal, however:
 <ul>
   <li>
     The link-based GET causes a mutation of server state (it deletes the session).
-    This is in conflict with the intended semantics of GET and  can interact poorly with other features of the web platform such as <a href="https://georgemauer.net/2024/08/01/a-heck-of-a-wild-bug-chase.html">prefetch</a>.
+    This is in conflict with the intended semantics of GET and can interact poorly with other features of the web platform such as prefetch.<f-note>
+      Not only did prefetch cause issues with a number of existing websites <a href=https://stackoverflow.com/a/14587231/15456438>when it was first introduced</a>,
+      it remains a <a href="https://georgemauer.net/2024/08/01/a-heck-of-a-wild-bug-chase.html">live source of bugs </a>even today.
+      </f-note>
   </li>
   <li>
     The form-based POST is more idiomatic, but the logout operation is idempotent and should be safely retryable, whereas a POST request is not.
@@ -1185,8 +1065,6 @@ That you cannot delete a resource with HTML is the primary semantic problem here
 Writing it as a link feels much more direct.
 We address this limitation in <a href="#">Triptych Proposal #2: Button HTTP Requests</a>.
 </f-note>
-
-<!-- Neither solution feels natural because they violate REST semantics. If the session is represented by the <code>/session</code>, neither GET or POST correctly describe what we want to do to that session (end it); if the action is described instead by the URI (i.e. POST to <code>/logout</code>) it violates the "action on a resource" vocabulary used elsewhere in the application. -->
 
 <p>
 The ideal request for this common piece of functionality would be one that is known to be mutative, known to be idempotent, and accurately describes the action being taken.
@@ -1204,7 +1082,7 @@ We use ExpressJS because it has an especially nice declarative interface for mid
 </f-note>
 
 <pre class="code">
-router.post(   '/reservation',                   requireLogin,          createReservation)
+router.post(   '/reservation',                   requireLogin,     createReservation)
 router.get(    '/reservation/:reservationId',    requireOwnership, getReservation)
 router.post(   '/reservation/:reservationId',    requireOwnership, updateReservation)
 </pre>
@@ -1270,17 +1148,6 @@ The client has access to idempotency semantics now, so the client knows that it'
 The network layers can log and track each of the actions at an appropriate level of granularity.
 And most importantly, the purpose of the server is clear and legible to present and future maintainers.
 
-<h3>Encourage Security Best Practices</h3>
-<p>
-Encourage same-origin, proper URI use
-
-<h3>Encourage Semantic HTML For Future Performance Gains</h3>
-
-<p>
-Anything written in HTML can be improved over time; moves critical web app functionality into HTML.
-
-https://stackoverflow.com/a/14587231/15456438
-
 <p>
 Caching and perf gains to be had with better HTTP method use
 
@@ -1290,7 +1157,7 @@ Caching and perf gains to be had with better HTTP method use
 PUT and DELETE are necessary to include a full CRUD grammar in HTML; PATCH is not.
 
 <p>
-If you are going to do the work to generalize the <code>&lt;/form&gt;</code> method attribute anyway, it doesn't seem like there's huge benefit to omitting PATCH. Nevertheless, the proposal could mostly success in its goals without PATCH, since most RESTful design practices focus on PUT and DELETE.
+If you are going to do the work to generalize the <code>&lt;form&gt;</code> method attribute anyway, it doesn't seem like there's huge benefit to omitting PATCH. Nevertheless, the proposal could mostly success in its goals without PATCH, since most RESTful design practices focus on PUT and DELETE.
 
 <h3>Allow for DELETE request bodies</h3>
 <p>
@@ -1304,11 +1171,6 @@ fine with DELETE content,
 A <code>usebody</code> attribute could be included to indicate support. If present, the form
 would send its data as part of the body, for DELETE (or GET) requests; it would be ignored for all
 other methods.
-
-
-
-<!-- Within this framework, we can understand HTTP methods as part of the manipulation semantics; they -->
-<!-- signify how the enclosed representation is to be processed. -->
 
 <section class=footnotes>
 <h2>Footnotes</h2>
@@ -1371,7 +1233,4 @@ for (heading of headings) {
   }
 }
 toc.append(topList)
-
 </script>
-
-<!-- https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3.4-10 -->
