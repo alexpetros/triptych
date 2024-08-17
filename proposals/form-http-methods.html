@@ -14,9 +14,9 @@
     Carson Gross (<a href="mailto:carson@bigsky.software">carson@bigsky.software</a>)
   </dd>
   <dt>Date Created</dt>
-  <dd>August 16, 2024
+  <dd>August 17, 2024
   <dt>Last Updated</dt>
-  <dd>August 16, 2024
+  <dd>August 17, 2024
   <dt>Status</dt>
   <dd>Published</dd>
 
@@ -458,7 +458,8 @@ Exactly what he means by <q>browsers stupid enough to believe that HTML defines 
 We do not propose that HTML execute arbitrary HTTP methods specified in the form's method attribute, although that would fit nicely within the REST guidelines by allowing web APIs to freely self-describe across an already-available dimension.<f-note>
 This is neverthless an intriguing idea.
 If HTML allowed the use of arbitrary HTTP methods, developers could pilot new client networking semantics in a backwards-compatible fashion.
-Of course, the implications of this are wide-ranging and far exceed the scope of this proposal.
+This concept was actually included in <a href="https://www.w3.org/TR/form-http-extensions/#introduction">W3C HTML Form HTTP Extensions</a>, another previous attempt to get these methods into HTTP forms.
+We choose to omit it here in an effort to reduce to surface are of this change, and make it more likely to be accepted.
 </f-note>
 Instead, we simply urge that HTML support the relevant, existing HTTP methods, which are so useful that they are universally-supported by servers in spite of their absence from the HTML standard.
 
