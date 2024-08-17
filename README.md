@@ -2,7 +2,7 @@
 
 [Triptych](https://alexanderpetros.com/triptych/) is a polyfill for three small HTML proposals:
 
-1. Support PUT, PATCH, and DELETE on forms ([proposal](https://alexanderpetros.com/triptych/form-http-methods))
+1. Support PUT, PATCH, and DELETE on forms ([proposal](https://alexanderpetros.com/triptych/form-http-methods), [WHATWG issue](https://github.com/whatwg/html/issues/3577#issuecomment-2294931398))
 2. Enable buttons to make HTTP requests without being wrapped in forms
 3. Enable links, forms, and buttons to target a part of the DOM for replacement
 
