@@ -1,15 +1,18 @@
 # Triptych - New Attributes for HTML
 
-[Triptych](https://alexanderpetros.com/triptych/) is a polyfill for three small HTML proposals:
+[Triptych](https://alexanderpetros.com/triptych) is a polyfill for three small HTML proposals:
 
-1. Support PUT, PATCH, and DELETE on forms ([proposal](https://alexanderpetros.com/triptych/form-http-methods), [WHATWG issue](https://github.com/whatwg/html/issues/3577#issuecomment-2294931398))
+1. [Support PUT, PATCH, and DELETE on forms](https://alexanderpetros.com/triptych/form-http-methods) ([WHATWG issue](https://github.com/whatwg/html/issues/3577#issuecomment-2294931398))
 2. Enable buttons to make HTTP requests without being wrapped in forms
 3. Enable links, forms, and buttons to target a part of the DOM for replacement
 
 Work on these proposals is in progress: we've put out the first one and the next two are coming soon.
 If you're interested in working on that, reach out to me!
 
+Status updates at: [https://alexanderpetros.com/triptych#status](https://alexanderpetros.com/triptych#status)
+
 ## Examples
+
 When the link is clicked, replace `<main>` with the result of `GET /home:`
 
 ```html
