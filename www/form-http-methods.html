@@ -3,7 +3,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="./proposal.css">
+<link rel="stylesheet" href="./specwriter.css">
+<script defer src="./specwriter.js"></script>
 
 <h1>Support PUT, PATCH, and DELETE in HTML Forms</h1>
 
@@ -16,17 +17,23 @@
   <dt>Date Created</dt>
   <dd>August 17, 2024
   <dt>Last Updated</dt>
-  <dd>August 17, 2024
+  <dd>August 26, 2024
+  <dt>Issue Tracker</dt>
+  <dd><a href="https://github.com/whatwg/html/issues/3577#issuecomment-2294931398">WHATWG Issue #3577</a> </dd>
   <dt>Status</dt>
   <dd>Published</dd>
 
 </dl>
 
+<noscript>
+  Both the table of contents and the footnotes are generated with Javascript.
+  It works this way because I want to be able to edit the proposal as a single HTML file, without any build steps.
+  If you're viewing this with no scripting, it will display footnotes inline with yellow highlighting.
+</noscript>
+
 <details class=toc open>
 <summary>Table of Contents</summary>
-<noscript>
-  The table of contents is generated with JavaScript, which you have disabled.
-</noscript>
+<table-of-contents></table-of-contents>
 </details>
 
 
@@ -156,10 +163,10 @@ The server can then choose to either send back a new page or redirect to one.
 <h3 id=basic-delete-form>Deleting A Resource</h3>
 
 The second form on the reservation page allows the user to delete their reservation:<f-note>
-In Bugzilla Issue #10671, <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c16">Ian Hickson wrote</a>: <q>PUT as a form method makes no sense, you wouldn't want to PUT a form payload. DELETE only makes sense if there is no payload, so it doesn't make much sense with forms either.</q>.
+In Bugzilla Issue #10671, <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c16">Ian Hickson wrote</a>: <q>PUT as a form method makes no sense, you wouldn't want to PUT a form payload. DELETE only makes sense if there is no payload, so it doesn't make much sense with forms either.</q>
 <br>
-While we disagree with this comment for the many of the same reasons that <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c18">Cameron Jones</a> and <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c21">Tom Wardrop</a> did originally, there is one limited sense in which Hickson's comment is correct: it doesn't make much sense to wrap a button in a form tag to issue a payload-less DELETE request.
-We address this limitation in <a href="#">Triptych Proposal #2: Button HTTP Requests</a>.
+While we disagree with this comment for the many of the same reasons that <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c18">Cameron Jones</a> and <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c21">Tom Wardrop</a> did originally, there is one limited sense in which Hickson's comment is correct: it doesn't make much sense that you have to wrap a button in a form tag to issue a payload-less DELETE request.
+We address this limitation in <a href="/triptych/button-requests">Triptych Proposal #2: Button HTTP Requests</a>.
 </f-note>
 
 
@@ -189,6 +196,11 @@ If the response status code is not a redirection code (300-399), the browser sho
 of the response in the page, exactly the same way it would for the response of a POST form.
 It should likewise update the page URL and history.
 
+<p>
+Browsers should identically render the response content for all non-redirection codes;
+we do not propose any special behavior for codes like 201 (Created) or or 500 (Internal Server Error).
+This aligns with current browser behavior.
+
 <h3>Redirection</h3>
 <p>
 For PUT, PATCH, and DELETE requests, if the server responds with a 301, 302, or 307 status code, the browser should perform a subsequent request with the same HTTP method;
@@ -216,7 +228,7 @@ So it would be good to clarify that PUT and DELETE, when being redirected by 301
 
 <p>
 If the response redirects to a server of the same origin, the browser should directly issue the request.
-For behavior when the response redirects to a server of a different origin, see <section-ref ref=cors>CORS</section-ref>.
+For behavior when the response redirects to a server of a different origin, see <section-ref ref=Security-Profile>Security Profile</section-ref>.
 
 <h3 id=body-content>Body Content</h3>
 
@@ -273,7 +285,8 @@ response to represent that resource.<f-note>
 <a href="https://www.rfc-editor.org/rfc/rfc5789#section-2">RFC 5789 Section 2</a>,
 </f-note> Browsers that implement this behavior for POST requests should do so for PATCH requests,
 although the spec notes that the overwhelming majority of cache implementations do not.<f-note>
-<a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.3-2">RFC 9110 Section 9.2.3</a>,
+  <a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-9.2.3-2">RFC 9110 Section 9.2.3</a>
+</f-note>
 
 <p>
 PUT and DELETE responses are never cacheable.<f-note>
@@ -286,7 +299,7 @@ PUT and DELETE responses are never cacheable.<f-note>
 For same-origin requests, the browser should directly issue the request. For cross-origin requests, the browser should do the following:
 
 <ol>
-  <li>Issue a CORS preflight request to the URI at the <code>method</code> attribute.</li>
+  <li>Issue a CORS preflight request to the URI at the <code>action</code> attribute.</li>
   <li>If the server responds indicating that the request is not allowed, throw an error (visible to the user, in the same manner as an infinite redirect or bad certificate)</li>
   <li>Otherwise, issue the request.</li>
   <li>If the server responds with a redirect, issue a new CORS request
@@ -327,7 +340,7 @@ For PATCH requests, which are not idempotent, the user agent should behave as it
 For PUT and DELETE requests, which are idempotent, the user agent should resubmit the request.
 This allows servers to take advantage of the method semantics and create forms that users on unreliable connections can feel confident re-submitting.
 
-<h2>Security Profile</h2>
+<h2 id=Security-Profile>Security Profile</h2>
 <h3>Client Capabilities</h3>
 <p>
 First and foremost, new browser features must not expose existing servers or users to new vulnerabilities, so adding new CORS-safelisted methods or headers is out of the question.
@@ -383,7 +396,7 @@ In 2000, Roy Fielding published a PhD dissertation in which he introduced the Re
 Transfer (REST) architectural style for distributed hypermedia systems.
 While these principles were used to guide the early development of the World Wide Web, they are
 often badly misunderstood.<f-note>
-Carson Gross notes in <a href="https://htmx.org/essays/hateoas/"><cite class=article>HATEOAS — An Alternative Explanation</cite></a> that the <a href="https://en.wikipedia.org/wiki/HATEOAS">Wikipedia Entry for "Hypertext as the engine of application state"</a>, one REST's fundamental constraints, uses a JSON API as an example, even though JSON is not hypertext.
+Carson Gross notes in <a href="https://htmx.org/essays/hateoas/"><cite class=article>HATEOAS — An Alternative Explanation</cite></a> that the <a href="https://en.wikipedia.org/wiki/HATEOAS">Wikipedia Entry for "Hypertext as the engine of application state"</a>, one of REST's fundamental constraints, uses a JSON API as an example, even though JSON is not hypertext.
 Roy Fielding is less polite: in <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven"><cite class=article>REST APIs must be hypertext-driven</cite></a>, he complains that a different "REST" API, which also did not user hypertext, has <q>so much coupling on display that it should be given an X rating.</q>
 </f-note>
 
@@ -459,7 +472,7 @@ We do not propose that HTML execute arbitrary HTTP methods specified in the form
 This is neverthless an intriguing idea.
 If HTML allowed the use of arbitrary HTTP methods, developers could pilot new client networking semantics in a backwards-compatible fashion.
 This concept was actually included in <a href="https://www.w3.org/TR/form-http-extensions/#introduction">W3C HTML Form HTTP Extensions</a>, another previous attempt to get these methods into HTTP forms.
-We choose to omit it here in an effort to reduce to surface are of this change, and make it more likely to be accepted.
+We choose to omit it here in an effort to reduce to surface area of this change, and make it more likely to be accepted.
 </f-note>
 Instead, we simply urge that HTML support the relevant, existing HTTP methods, which are so useful that they are universally-supported by servers in spite of their absence from the HTML standard.
 
@@ -595,7 +608,7 @@ The new lifecycle methods would make it possible for those applications to built
 Lacking proper browser support, developers still consider method semantics important enough to their
 API design that they come up with ad-hoc methods to achieve the same result.
 
-<h3>The Hidden Input Hack</h3>
+<h3 id=hidden-input-hack>The Hidden Input Hack</h3>
 
 <p>
 The most common way that developers compensate for the lack of proper HTTP method support is to
@@ -673,7 +686,7 @@ If the developer is not presented with a consistent set of common verbs for comm
 Why shouldn't <code>/put</code> be <code>/create</code>, or <code>/delete</code> be <code>/remove</code>?<f-note>
 You might reasonably wonder why this is bad, when earlier we discussed how interesting opportunities that would be available if methods were entirely arbitrary.
 The answer is: because telling the user agent what the method is lets it pilot new features and be resilient to ones it doesn't understand.
-When extensions like these are tried out in the method slot, the user agent can choose to optimize them if they are recognized—like trusting the idempotence or GET or PUT—or
+When extensions like these are tried out in the method slot, the user agent can choose to optimize them if they are recognized—like trusting the idempotence of GET or PUT—or
 fallback to a baseline behavior if they are not.
 Of course, HTTP <em>already</em> has features that differentiate GET, POST, PUT, and DELETE, so the question of whether browsers might build features around those is not theoretical—they already do.
 </f-note>
@@ -709,8 +722,6 @@ for HTTP methods.
   <td>
     <a href="https://expressjs.com">
       Express
-    </a>
-    </a>
     </a>
   </td>
   <td>
@@ -1114,7 +1125,7 @@ If <code>POST /reservations/:reservationId</code> starts throwing internal serve
 
 <p>
 Also, deletes and updates might have different permissions associated with them!
-What if you want to implement group reservations, and give everyone in the group permission to edit the reservation, but only the own permission to delete it?
+What if you want to implement group reservations, and give everyone in the group permission to edit the reservation, but only the owner permission to delete it?
 The safest, simplest, and most secure way would be to have separate routes with separate permission functions, but since we're re-using one function for two actions, we don't have access to that.
 To accomplish that, we have to mess with the URI:
 
@@ -1149,89 +1160,97 @@ The client has access to idempotency semantics now, so the client knows that it'
 The network layers can log and track each of the actions at an appropriate level of granularity.
 And most importantly, the purpose of the server is clear and legible to present and future maintainers.
 
-<p>
-Caching and perf gains to be had with better HTTP method use
-
 <h2>Alternatives and Additions</h2>
+
+<h3 id=custom-method>Custom Method Attribute</h3>
+
+<p>
+In addition to adding PUT, PATCH, and DELETE support to the <code>method</code> attribute, it makes a lot of sense to add another attribute, <code>custommethod</code>, that overrides the value in <code>method</code>:
+
+<pre class="code">
+&lt;form action="/reservations/123" method="POST" custommethod="PUT"&gt;
+  &lt;input type="text" name="name"&gt;
+  &lt;button&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+<p>
+In this example, browsers that support PUT and <code>custommethod</code> would issue a PUT request to the specified action, while browsers that do not support those features would issue a POST request (servers would have to support both methods, of course).
+This solves the problem where existing browsers that do not recognize the value in <code>method</code> will fallback to a GET request, by allowing <code>method</code> to serve as a "best supported method" fallback, while <code>custommethod</code> explicitly denotes experimental behavior.<f-note>
+If the author intended to send form data as body content, this has the regrettable side-effect of exposing that form data to the URL in the form of query parameters.
+This could cause information leakage—URLs are visible in plaintext in various context where request content is not.
+As long as browser support for the new methods remains a live concern, the possibility of information leakage will hinder adoption in sensitive contexts.
+<br><br>
+Thanks to <a href="https://github.com/whatwg/html/issues/3577#issuecomment-2303573521">@jlunman</a> for asking us to address this issue.
+</f-note>
+
+<p>
+Another major advantage of the <code>custommethod</code> attribute is that it allows for a more robust polyfill mechanism.
+The existing <a href="https://github.com/alexpetros/triptych">Triptych polyfill</a> has the crucial caveat that client-side JavaScript cannot modify navigation in the manner necessary to create the robust experience proposed here.
+The addition of a bridge attribute enables a better, navigation-only polyfill, from the <em>server</em> side:
+
+<pre class="code">
+&lt;form action="/reservations/123" method="POST" custommethod="PUT"&gt;
+  &lt;input type="hidden" name="_method" value="PUT"&gt;
+  &lt;input type="text" name="name"&gt;
+  &lt;button&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+<p>
+While a bit clunky visually, this form builds on the existing method workarounds to create a smooth upgrade path.
+Servers that recognize the <section-ref ref="hidden-input-hack">hidden input hack</section-ref> can handle matching POST and PUT requests with the same handler function. That one handler can return a 303 "See Other" redirect for both cases, which achieves the same thing regardless of whether the browser sent a POST or a PUT request.
+As browser support picks up and the need for a fallback diminishes, the hidden input and override can be removed in favor of a single <code>method=PUT</code>.
+
+<p>
+We chose <code>custommethod</code> as the attribute name in anticipating that it will one day be used for proper custom HTTP method support, of the kind anticipated in <a href="https://www.w3.org/TR/form-http-extensions/#introduction">this working group note.</a>
+Eventually, it can be used for entirely arbitrary HTTP methods, while <code>method</code> is reserved for officially supported ones.
+In this manner, the upgrade/fallback mechanism proposed here can be re-used for future additions to HTTP's methods.
+
 <h3>Omit PATCH</h3>
 <p>
 PUT and DELETE are necessary to include a full CRUD grammar in HTML; PATCH is not.
 
 <p>
-If you are going to do the work to generalize the <code>&lt;form&gt;</code> method attribute anyway, it doesn't seem like there's huge benefit to omitting PATCH. Nevertheless, the proposal could mostly success in its goals without PATCH, since most RESTful design practices focus on PUT and DELETE.
+If you are going to do the work to generalize the <code>&lt;form&gt;</code> method attribute anyway, it doesn't seem like there's huge benefit to omitting PATCH. Nevertheless, the proposal could mostly succeed in its goals without PATCH, since most RESTful design practices focus on PUT and DELETE.
 
 <h3>Allow for DELETE request bodies</h3>
 <p>
-There's no inherent reason why a DELETE request couldn't send body content, and many popular
-frameworks, like ExpressJS, do support it. Nor is DELETE content expressly prohibited by the spec,
-which allows for such requests if the origin server has indicated that it supports them.
-Since most HTML forms are same-origin, it could make sense to allow the form to indicate that it would be
-fine with DELETE content,
+There's no inherent reason why a DELETE request couldn't send body content, and many popular frameworks, like ExpressJS, do support it.
+Nor is DELETE content expressly prohibited by the spec, which allows for such requests if the origin server has indicated that it supports them.
+Since most HTML forms are same-origin, it could make sense to allow the form to indicate that it would be fine with DELETE content.
 
 <p>
-A <code>usebody</code> attribute could be included to indicate support. If present, the form
-would send its data as part of the body, for DELETE (or GET) requests; it would be ignored for all
-other methods.
+A <code>usebody</code> attribute could be included to indicate support.
+If present, the form would send its data as part of the body, for DELETE (or GET) requests;
+it would be ignored for all other methods.
+
+<h2 id=history>Update History</h2>
+
+<dl>
+  <dt> <time datetime="2024-09-04">Sept 4, 2024</time></dt>
+  <dd>
+    <ul>
+      <li>Changed <code>overridemethod</code> to <code>custommethod</code>
+      <li>Added note about handling non-redirection codes identically
+    </ul>
+  </dd>
+  <dt> <time datetime="2024-08-29">Aug 29, 2024</time></dt>
+  <dd>
+    <ul>
+      <li>Attended <a href="https://github.com/whatwg/html/issues/10574#issuecomment-2318560972">WHATNOT meeting</a> and received feedback on proposal.
+    </ul>
+  </dd>
+  <dt> <time datetime="2024-08-26">Aug 26, 2024</time></dt>
+  <dd>
+    <ul>
+      <li>Added "Override Method and Server-Side Polyfill" section
+    </ul>
+  </dd>
+</dl>
+
 
 <section class=footnotes>
 <h2>Footnotes</h2>
+<footnote-list></footnote-list>
 </section>
-
-
-<script>
-// Create <section-ref> element
-class SectionRef extends HTMLElement {
-  connectedCallback() {
-    const content = this.innerHTML
-    const ref = this.attributes.ref.value
-    this.innerHTML = `<a href="#${ref}">${content}</a>`
-  }
-}
-
-customElements.define('section-ref', SectionRef)
-// Create <f-note> element
-class Footnote extends HTMLElement {
-  static numFootnotes = 0
-
-  connectedCallback() {
-    Footnote.numFootnotes += 1
-
-    this.content = this.innerHTML
-    this.num = Footnote.numFootnotes
-    this.innerHTML = `<sup id="fn-${this.num}"><a href="#ref-${this.num}">[${this.num}]</a></sup>`
-  }
-}
-customElements.define('f-note', Footnote)
-
-// Create footnotes section
-const footnotesSection = document.querySelector('section.footnotes')
-const footnotes = document.querySelectorAll('f-note')
-for (footnote of footnotes) {
-  const p = document.createElement('p')
-  p.classList.add('footnote')
-  p.id = `ref-${footnote.num}`
-  p.innerHTML = `[${footnote.num}] ${footnote.content} <a href="#fn-${footnote.num}">↩</a>`
-  footnotesSection.append(p)
-}
-
-// Create table of contents
-const toc = document.querySelector('details.toc')
-const headings = document.querySelectorAll('h2,h3')
-const topList = document.createElement('ol')
-let currentH2
-for (heading of headings) {
-  // Create an id if one doesn't exist
-  heading.id = heading.id || heading.innerText.replace(' ', '-')
-  if (heading.tagName === 'H2') {
-    currentH2 = document.createElement('li')
-    currentH2.innerHTML = `<a href="#${heading.id}">${heading.innerText}</a><ol></ol>`
-    topList.append(currentH2)
-  } else {
-    const h2Sublist = currentH2.querySelector('ol')
-    const h3Item = document.createElement('li')
-    h3Item.innerHTML = `<a href="#${heading.id}">${heading.innerText}</a><ol></ol>`
-    h2Sublist.append(h3Item)
-  }
-}
-toc.append(topList)
-</script>

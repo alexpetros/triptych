@@ -1,0 +1,135 @@
+:root {
+  --page-background: white;
+  --header-color: #039;
+  --highlight-color: yellow;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  background-color: var(--page-background);
+  font-family: Verdana;
+  margin: 20px auto;
+  max-width: 900px;
+  padding: 0 20px;
+  line-height: 1.3;
+}
+
+h1, h2, h3, h4 {
+  color: var(--header-color);
+  font-weight: normal;
+}
+
+h1 {
+  counter-reset: header-count;
+}
+
+h2 {
+  counter-reset: subheader-count;
+}
+
+h2::before {
+  counter-increment: header-count;
+  content: counter(header-count) '. ';
+}
+
+h3 {
+  counter-reset: subsubheader-count;
+}
+
+
+h3::before {
+  counter-increment: subheader-count;
+  content: counter(header-count) '.' counter(subheader-count) '. ';
+}
+
+h4::before {
+  counter-increment: subsubheader-count;
+  content: counter(header-count) '.' counter(subheader-count) '.' counter(subsubheader-count) '. '
+}
+
+dt {
+  font-weight: bold;
+}
+
+a:visited {
+  color: blue;
+}
+
+details {
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  padding: 0.5em 0.5em 0;
+}
+
+details[open] summary {
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 0.5em;
+}
+
+summary {
+  font-weight: bold;
+  user-select: none;
+  margin: -0.5em -0.5em 0;
+  padding: 0.5em;
+}
+
+summary:hover {
+  background-color: lightgray;
+}
+
+pre.code {
+  font-family: Monospace;
+  overflow: auto;
+  background-color: lightgray;
+  padding: 10px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+tr {
+  border: 1px solid black;
+}
+
+th {
+  text-align: left;
+}
+
+th, td {
+  padding: 5px 10px;
+}
+
+div.notice {
+  background-color: bisque;
+  padding: 1rem;
+}
+
+/* specwriter */
+p.footnote {
+  background-color: var(--page-background);
+  padding: 5px 0;
+}
+
+p.footnote:target {
+  background-color: var(--highlight-color);
+}
+
+/* slightly crude hack to differentiate the footnotes from regular text in noscript environments */
+f-note:not(:has(sup)) {
+  background-color: var(--highlight-color);
+}
+
+.toc ol {
+  counter-reset: toc-count;
+  list-style-type: none;
+}
+
+.toc ol li::before {
+  counter-increment: toc-count;
+  content: counters(toc-count, '.', decimal) '. ';
+}
+

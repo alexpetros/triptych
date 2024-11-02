@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<title>Triptych Proposals</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: Verdana;
+  padding: 0 20px;
+  max-width: 800px;
+  margin: 40px auto;
+  line-height: 1.4;
+}
+
+a, a:visited {
+  color: blue;
+}
+
+table {
+  width: 90%;
+  margin: 30px auto;
+  border-collapse: collapse;
+  border: 1px solid black;
+}
+
+th {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid black;
+}
+
+td {
+  padding: 10px;
+}
+
+time {
+  font-style: italic;
+}
+</style>
+
+<h1>Triptych Proposals</h1>
+
+<p>
+Three small proposals for putting "hyper" back in the hypertext.
+</p>
+
+<table>
+  <tr>
+    <th>Proposal
+    <th>Issue Tracker
+  </tr>
+  <tr>
+    <td><a href="/triptych/form-http-methods">Support PUT, PATCH, and DELETE in HTML Forms</a>
+    <td><a href="https://github.com/whatwg/html/issues/3577#issuecomment-2294931398">Issue #3577</a>
+  </tr>
+ <tr>
+    <td>Button HTTP Requests
+    <td>Pending
+  </tr>
+  <tr>
+    <td>Partial Page Replacement
+    <td>Pending
+  </tr>
+</table>
+
+<section>
+<h2 id=explanation>Explanation</h2>
+<p>
+Triptych is three simple proposals that make HTML much more expressive in how it can make and handle network requests.
+
+<p>
+If you are a practical person, you could say it brings the best of <a href="https://htmx.org/">htmx</a> (and other attributed-based page replacement libraries, like <a href="https://turbo.hotwired.dev/">turbo</a> and <a href="https://unpoly.com/">unpoly</a>) to HTML. For the more theoretically-inclined, it <a href="/triptych/form-http-methods#completing-rest">completes</a> HTML's ability to do Representational State Transfer (REST) by making it a sufficient <a href="https://htmx.org/essays/hateoas/">self-describing representation</a> for a much wider variety of problem spaces.
+
+<p>
+Basically, it should be easy to use HTML to declare page behavior that makes HTTP requests, and then tell the browser to either do a full-page navigation or replace part of the page with the response. Triptych enables this by bringing all the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods">HTTP methods</a> to HTML, giving buttons to ability to make requests without the help of a form, and making it possible to target a DOM subtree for replacement with the response.
+
+<p>
+I first outlined these proposals in <a href="https://unplannedobsolescence.com/blog/life-and-death-of-htmx/">The Life & Death of htmx</a> at Big Sky Dev Con.
+
+<p>
+See also: the <a href="https://github.com/alexpetros/triptych">Triptych Polyfill (on GitHub)</a>.
+</section>
+
+<section>
+<h2 id=status>Status</h2>
+<p>Working on an update to the fetch spec that's required to get CORS support in forms.
+
+<p>For a full history of changes to the Forms proposal, see <a href="/triptych/form-http-methods#history">the updates section</a>.
+
+<p style="font-style: italic">Last Updated: Sept 22, 2024
+</section>
+
+<section>
+<h2 id=related-hyperlinks>Related Hyperlinks</h2>
+<ul>
+  <li> <a href="https://htmx.org/essays/how-did-rest-come-to-mean-the-opposite-of-rest/">How Did REST Come To Mean The Opposite of REST?</a>
+  <li> <a href="https://unplannedobsolescence.com/blog/hard-page-load/">Who's Afraid of a Hard Page Load?</a>
+  <li> <a href="https://htmx.org/essays/is-htmx-another-javascript-framework/">Is htmx Just Another JavaScript Framework?</a>
+  <li> <a href="https://htmx.org/essays/a-response-to-rich-harris/">A Response To "Have Single-Page Apps Ruined the Web?"</a>
+  <li> Why do the htmx maintainers title so many blogs with rhetorical questions? (just kidding)
+</ul>
+</section>
