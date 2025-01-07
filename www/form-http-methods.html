@@ -362,7 +362,7 @@ The spec has never guaranteed that these would be the only two methods, and it's
 
 <h3>Opportunity For a Pit of Success</h3>
 <p>
-The addition of CORS-restricted methods to HTML forms provides a massive opportunity to move developers onto a more secure pattern web applications.
+The addition of CORS-restricted methods to HTML forms provides a massive opportunity to move developers onto a more secure pattern for building web applications.
 PUT, PATCH, and DELETE requests are more secure, by default, than POST requests, because they will <em>never</em> be issued to a cross-origin server unless that server explicitly permits them.<f-note>
 This is another, highly significant, reason not to tunnel PUT and DELETE through POST requests with ad-hoc semantics, one that did not exist when Amundsen et. al were arguing for PUT and DELETE support in
 <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c4">WHATWG Bug 10671</a>.
@@ -850,7 +850,7 @@ for HTTP methods.
 
 <p>
 Support for all HTTP methods is also widespread in client-side frameworks.
-Interestingly, this support is increasingly used for HTML-based APIs, in additional to JSON-based APIs, indicating that there is demand for a full implementation of HTTP methods in HTML.
+Interestingly, this support is increasingly used for HTML-based APIs, in addition to JSON-based APIs, indicating that there is demand for a full implementation of HTTP methods in HTML.
 
 <p>
 Below is a table of client side frameworks that use HTML as a network format, as well as their support for the various HTTP.
@@ -929,8 +929,8 @@ Below is a table of client side frameworks that use HTML as a network format, as
 <h3>Usage of Non-GET &amp; Non-POST Methods</h3>
 
 <p>
-While the above table establishes the general support for the full gamut of HTTP methods, it does not establish the
-usefulness of them for web developers.  In order to get a feel for that, we can search Github for use of the following
+While the above table establishes the general support for the full gamut of HTTP methods, it does not establish their
+usefulness for web developers.  In order to get a feel for that, we can search Github for use of the following
 htmx attributes: <code>hx-put</code>, <code>hx-patch</code> &amp; <code>hx-delete</code>, which are used to issue
   the HTTP <code>PUT</code>, <code>PATCH</code> and <code>DELETE</code> methods respectively.
 
@@ -1103,7 +1103,7 @@ router.post(   '/reservation/:reservationId',    requireOwnership, updateReserva
 Even if you are unfamiliar with ExpressJS, it is relatively easy to understand what is going on here.
 ExpressJS lets you declare a method, a route, and then a series of functions that handle the request.
 To make a reservation, the client issues a POST request to <code>/reservation</code>, then runs the <code>requireLogin</code> function, and if that succeeds, runs the <code>createReservation</code> function.<f-note>
-The indentation servers no purpose other than readability.
+The indentation serves no purpose other than readability.
 </f-note>
 Viewing and updating a reservation requires it to be <em>your</em> reservation, checked by the <code>requireOwnership</code> method.
 
