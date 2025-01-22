@@ -3,8 +3,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="./specwriter.css">
-<script defer src="./specwriter.js"></script>
+<link rel="stylesheet" href="./specwriter/specwriter.css">
+<script defer src="./specwriter/specwriter.js"></script>
 
 <h1>Support PUT, PATCH, and DELETE in HTML Forms</h1>
 
@@ -17,7 +17,7 @@
   <dt>Date Created</dt>
   <dd>August 17, 2024
   <dt>Last Updated</dt>
-  <dd>August 26, 2024
+  <dd>November 10, 2024
   <dt>Issue Tracker</dt>
   <dd><a href="https://github.com/whatwg/html/issues/3577#issuecomment-2294931398">WHATWG Issue #3577</a> </dd>
   <dt>Status</dt>
@@ -216,14 +216,13 @@ For instance, <a
 and <a href="https://stackoverflow.com/questions/71975005/rails-not-redirecting-on-put-request-sending-406-back-instead">Rails</a>.
 </f-note>
 This resolves a blocker for the original Firefox beta implementation.<f-note>
-On 01/12/2011, at 9:57 PM,
-<a href="https://lists.w3.org/Archives/Public/public-html-comments/2011Apr/0000.html">
-Julian Reschke wrote:</a>
-<q>One thing I forgot earlier, and which was the reason why I actually wanted PUT and DELETE
-temporarily (!) on hold is redirect handling. The experimental Firefox implementation was copying
-the redirect handling for POST (with respect to method rewriting), and it would have been bad to let this get into the deployed platform.
-The experimental Firefox implementation was copying the redirect.
-So it would be good to clarify that PUT and DELETE, when being redirected by 301/302 should *not* be rewritten to GET.</q>
+On Sat, 02 Apr 2011,
+<a href="https://lists.w3.org/Archives/Public/public-html-comments/2011Apr/0008.html">
+Julian Reschke writes:</a>
+<q>In the meantime I recalled the main reason why I got nervous about what
+the FF4 beta implemented; it adopted the broken XHR behavior for
+following redirects (rewriting the request method to GET), and it also
+had the URI encoding for one of the methods wrong.</q>
 </f-note>
 
 <p>
@@ -362,7 +361,7 @@ The spec has never guaranteed that these would be the only two methods, and it's
 
 <h3>Opportunity For a Pit of Success</h3>
 <p>
-The addition of CORS-restricted methods to HTML forms provides a massive opportunity to move developers onto a more secure pattern web applications.
+The addition of CORS-restricted methods to HTML forms provides a massive opportunity to move developers onto a more secure pattern for building web applications.
 PUT, PATCH, and DELETE requests are more secure, by default, than POST requests, because they will <em>never</em> be issued to a cross-origin server unless that server explicitly permits them.<f-note>
 This is another, highly significant, reason not to tunnel PUT and DELETE through POST requests with ad-hoc semantics, one that did not exist when Amundsen et. al were arguing for PUT and DELETE support in
 <a href="https://www.w3.org/Bugs/Public/show_bug.cgi?id=10671#c4">WHATWG Bug 10671</a>.
@@ -500,7 +499,7 @@ respectively.
 
 <p>
 The increased salience of HTTP methods to REST is not a perversion of the concept, but a practical evolution of it, born from real-world use.
-Aspirational REST adherents have discovered that it is much easier to uphold a consistent representation of a resource (via URIs) when you have a standardized semantic for to describe <em>how</em> the enclosed resource is to be modified.
+Aspirational REST adherents have discovered that it is much easier to uphold a consistent representation of a resource (via URIs) when you have a standardized semantic to describe <em>how</em> the enclosed resource is to be modified.
 
 <p>
 For instance, this overview is from the first API tutorial in the latest ASP.NET Core documentation:<f-note>
@@ -649,7 +648,7 @@ These points are not new; many of them were made by Mike Amundsen in the closed
   <li>PUT and DELETE do not have the same CORS exemptions that POST does, making them more secure for user agent (discussed in <section-ref ref=cors>CORS</section-ref>)
 </ul>
 
-<h3>Ad-hoc URI Semantics</h3>
+<h3 id=ad-hoc-uri-semantics>Ad-hoc URI Semantics</h3>
 
 <p>
 Another workaround is to encode the method semantics straight into the URI.
@@ -846,11 +845,11 @@ for HTTP methods.
 </table>
 
 
-<h3>REST Support in Client Libraries</h3>
+<h3 id=rest-client-support>REST Support in Client Libraries</h3>
 
 <p>
 Support for all HTTP methods is also widespread in client-side frameworks.
-Interestingly, this support is increasingly used for HTML-based APIs, in additional to JSON-based APIs, indicating that there is demand for a full implementation of HTTP methods in HTML.
+Interestingly, this support is increasingly used for HTML-based APIs, in addition to JSON-based APIs, indicating that there is demand for a full implementation of HTTP methods in HTML.
 
 <p>
 Below is a table of client side frameworks that use HTML as a network format, as well as their support for the various HTTP.
@@ -926,11 +925,11 @@ Below is a table of client side frameworks that use HTML as a network format, as
   </tbody>
 </table>
 
-<h3>Usage of Non-GET &amp; Non-POST Methods</h3>
+<h3 id=usage-non-get-non-post>Usage of Non-GET &amp; Non-POST Methods</h3>
 
 <p>
-While the above table establishes the general support for the full gamut of HTTP methods, it does not establish the
-usefulness of them for web developers.  In order to get a feel for that, we can search Github for use of the following
+While the above table establishes the general support for the full gamut of HTTP methods, it does not establish their usefulness web developers.
+In order to get a feel for that, we can search Github for use of the following
 htmx attributes: <code>hx-put</code>, <code>hx-patch</code> &amp; <code>hx-delete</code>, which are used to issue
   the HTTP <code>PUT</code>, <code>PATCH</code> and <code>DELETE</code> methods respectively.
 
@@ -1082,7 +1081,7 @@ We address this limitation in <a href="#">Triptych Proposal #2: Button HTTP Requ
 The ideal request for this common piece of functionality would be one that is known to be mutative, known to be idempotent, and accurately describes the action being taken.
 If HTML were able to issue a <code>DELETE</code> to <code>/session</code> it would these needs in a way that it currently cannot, making implementing this extremely common functionality less error-prone and more natural.
 
-<h3>Application Server Permissions</h3>
+<h3 id=application-server-permissions>Application Server Permissions</h3>
 
 <p>
 The most popular web frameworks all support the ability to declare handlers for HTTP route and method combos.
@@ -1103,7 +1102,7 @@ router.post(   '/reservation/:reservationId',    requireOwnership, updateReserva
 Even if you are unfamiliar with ExpressJS, it is relatively easy to understand what is going on here.
 ExpressJS lets you declare a method, a route, and then a series of functions that handle the request.
 To make a reservation, the client issues a POST request to <code>/reservation</code>, then runs the <code>requireLogin</code> function, and if that succeeds, runs the <code>createReservation</code> function.<f-note>
-The indentation servers no purpose other than readability.
+The indentation serves no purpose other than readability.
 </f-note>
 Viewing and updating a reservation requires it to be <em>your</em> reservation, checked by the <code>requireOwnership</code> method.
 
@@ -1228,6 +1227,12 @@ it would be ignored for all other methods.
 <h2 id=history>Update History</h2>
 
 <dl>
+  <dt> <time datetime="2024-11-10">Nov 10, 2024</time></dt>
+  <dd>
+    <ul>
+      <li>Publish <a href="https://github.com/whatwg/fetch/pull/1785">proposed fetch spec changes</a> required to support CORS preflights in navigation.
+    </ul>
+  </dd>
   <dt> <time datetime="2024-09-04">Sept 4, 2024</time></dt>
   <dd>
     <ul>
@@ -1250,7 +1255,7 @@ it would be ignored for all other methods.
 </dl>
 
 
-<section class=footnotes>
+<section>
 <h2>Footnotes</h2>
 <footnote-list></footnote-list>
 </section>

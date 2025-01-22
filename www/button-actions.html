@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Button Actions</title>
+<link rel="stylesheet" href="./specwriter/specwriter.css">
+<script defer src="./specwriter/specwriter.js"></script>
+
+<h1>Button Actions</h1>
+
+<dl>
+  <dt>Authors</dt>
+  <dd>
+    Alexander Petros (<a href="mailto:contact@alexpetros.com">contact@alexpetros.com</a>)<br>
+    Carson Gross (<a href="mailto:carson@bigsky.software">carson@bigsky.software</a>)
+  </dd>
+  <dt>Date Created</dt>
+  <dd>December 1, 2024
+  <dt>Last Updated</dt>
+  <dd>December 1, 2024
+  <dt>Issue Tracker</dt>
+  <dd>Pending
+  <dt>Status</dt>
+  <dd>Pending</dd>
+</dl>
+
+<noscript>
+  Both the table of contents and the footnotes are generated with Javascript.
+  It works this way because I want to be able to edit the proposal as a single HTML file, without any build steps.
+  If you're viewing this with no scripting, it will display footnotes inline with yellow highlighting.
+</noscript>
+
+<details class=toc open>
+<summary>Table of Contents</summary>
+<table-of-contents></table-of-contents>
+</details>
+
+<section>
+<h2>Summary</h2>
+<p>
+Give buttons the <code>action</code> attribute, allowing them to make HTTP requests.
+
+<p>
+Proposal 2/3 in the <a href="https://alexanderpetros.com/triptych/">Triptych Proposals</a>.
+
+<h3>Goals</h3>
+<ul>
+  <li>Enhance the button's ability to describe networked interactivity
+  <li>Encourage semantic use of buttons by giving them interactive capabilities that other elements lack
+  <li>Expand HTML's ability to describe network requests (declaratively)
+</ul>
+
+</section>
+
+<section>
+<h2>Proposed Changes</h2>
+
+<p>
+New attributes for the button:
+<ul>
+ <li><code>action</code> - the URL to request
+ <li><code>method</code> - the HTTP method to make the request with
+</ul>
+
+These attributes re-use the grammar and functionality of the form element.
+</section>
+
+
+<!-- This and the following example will make use of Triptych's addition of PUT and DELETE methods to HTML, to better demonstrate the utility and power of the paradigm. -->
+<!-- That is not to say that PUT and DELETE are required to make button actions useful. -->
+<!-- Like the POST /logout button, <a href="./triptych/form-http-methods#ad-hoc-uri-semantics">existing hacks</a> can be used alongside button requests to work around HTML's deficient method support; -->
+<!-- although they work better together, this proposal is separate from its predecessor precisely because it has independent value. -->
+
+<section>
+<h2 id=sample-usage>Sample Usage</h2>
+
+<h3 id=logout-button>Logout Button</h3>
+<p>
+One of the most common user interactions on the web is logging in or out of a website.
+Logins can be accomplished with a POST form, which (at its simplest) requires a username and password.
+
+<p>
+Logouts, however, do not submit data.
+There is currently no semantic way to represent a logout button;
+you have to wrap it in a form.
+
+<pre class=code>&lt;form action=/logout method=POST&gt;&lt;button&gt;Logout&lt;/button&gt;&lt;/form&gt;</pre>
+
+<p>
+With support for button actions, we can instead model this as creating or deleting a "session" resource.<f-note>Absent <a href="./form-http-methods">PUT, PATCH, and DELETE support</a>, we can instead do <code>&lt;button action=/logout method=POST&gt;Logout&lt;/button&gt;</code>, which is also fine.</f-note>
+
+<pre class=code>&lt;button action=/session method=DELETE&gt;Logout&lt;/button&gt;</pre>
+
+This creates a simplifying symmetry for session management, and allows the logout action to take advantage of DELETE's idempotency.<f-note>
+One benefit of this simplification is enabling server frameworks that implement file-based routing (like base PHP, SvelteKit, and NextJS) to implement their authentication entirely within one file.
+A JS codebase, for instance, might have a <code>sessions.js</code> file, which exports two methods: <code>post</code> and <code>delete</code>. That same file can contain internal helper functions that handle authentication, nicely encapsulating the session management logic and re-using many of the same resources.
+<code></code>
+</f-note>
+
+
+<h3 id=multi-action-pages>Multi-Action Pages</h3>
+
+<p>
+Consider a simple job application webform, which uses button actions:
+
+<pre class=code>
+&lt;form action="/apply" method="POST"&gt;
+  &lt;input type="text" name="name"&gt;
+  &lt;input type="email" name="email"&gt;
+  &lt;textarea name="coverletter"&gt;&lt;/textarea&gt;
+
+  &lt;button&gt;Submit&lt;/button&gt;
+  &lt;button formaction="/draft"&gt;Save Draft&lt;/button&gt;
+  &lt;button action="/" method="GET"&gt;Cancel&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+<p>
+The first part of the form is three inputs that the job seeker must fill out: a name, an email, and a cover letter.
+
+<p>
+The second part is three actions you can take:
+you can submit the application, save a draft of it, or give up on applying entirely.
+Each of these buttons interacts with the <code>&lt;form&gt;</code> element differently!
+
+<ul>
+  <li>The <code>Submit</code> button submits the form, sending a POST request to the /apply URL.
+  <li>The <code>Save Draft</code> button submits the form, but its <code>formaction</code> attribute changes the form's submission URL to <code>/draft</code>.
+  <li>The <code>Cancel</code> button doesn't interact with the form at all. It just navigates back to the home page.
+</ul>
+
+<p>
+Semantically, each of these buttons represents a reasonable form operation:
+a user might choose to submit a form, save it as a draft, or cancel it entirely.
+Without button actions, you can't describe the "Cancel" action correctly.<f-note>
+The button element's existing <code>formmethod</code> and <code>formaction</code> methods, which modify the behavior of their containing form, cannot achieve the same "Cancel" experience: using them here would incorrectly navigate to the home page with the form's contents as a query parameter.
+<br><br>
+You <em>could</em> achieve the same behavior with a link, however, and just style it like a button.
+That will be discussed further in the existing workarounds section.
+</f-note>
+
+<p>
+Now let's say you save a draft and return to edit it. The web page looks like this:
+
+<pre class=code>
+&lt;form action="/apply" method="POST"&gt;
+  &lt;input type="text" name="name" value="Alexander Petros"&gt;
+  &lt;input type="email" name="email" value="contact@example.com"&gt;
+  &lt;textarea name="coverletter"&gt;
+    My name is Alex and my passion is enterprise software sales.
+  &lt;/textarea&gt;
+
+  &lt;button&gt;Submit&lt;/button&gt;
+  &lt;button formaction="/draft/123" formmethod="PUT"&gt;Save Draft&lt;/button&gt;
+  &lt;button action="/draft/123" method="DELETE"&gt;Delete Draft&lt;/button&gt;
+  &lt;button action="/" method="GET"&gt;Cancel&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+While the inputs of this form are the same, they have been pre-filled with the current values of the draft job application.<f-note>
+This is the essence of <a href="https://htmx.org/essays/hateoas/">Hypertext As the Engine of Application State (HATEOAS)</a>.
+</f-note>
+We have also changed one button and added a brand new one.
+
+<ul>
+  <li>The <code>Submit</code> button still submits the form.
+  <li>The <code>Save Draft</code> button now sets the method to PUT and the URL to /draft/123, which references the specific draft being modified.
+  <li>The <code>Delete Draft</code> button uses button actions to issue a DELETE request to /draft/123, with no body.
+  <li>The <code>Cancel</code> button still navigates to the home page.
+</ul>
+
+<p>
+Once again, all of these buttons are, from the user's perspective, co-equal form controls.
+But only two of the buttons rely on the form data; two of them do not.
+Adding buttons that can perform requests independently not only removes the need to wrap them in forms, it also allows for simpler nesting <em>within</em> forms to achieve a complete set of form controls.
+
+<p>
+For the sake of comparison, let's take a look at how you'd implement that last example with currently-existing native HTML controls:<f-note>Although still assuming the additional HTTP methods provided by Triptych #1; absent those it's even less clear, because you have to use make both "Save Draft" and "Delete Draft" POSTS, and change the "Delete Draft" URL to <code>/draft/123</code>.</f-note>
+
+<pre class=code>
+&lt;form action="/apply" method="POST"&gt;
+  &lt;input type="text" name="name" value="Alexander Petros"&gt;
+  &lt;input type="email" name="email" value="contact@example.com"&gt;
+  &lt;textarea name="coverletter"&gt;
+    My name is Alex and my passion is enterprise software sales.
+  &lt;/textarea&gt;
+
+  &lt;button&gt;Submit&lt;/button&gt;
+  &lt;button formaction="/draft/123" formmethod="PUT"&gt;Save Draft&lt;/button&gt;
+  &lt;form action="/draft/123" method="DELETE"&gt;&lt;button&gt;Delete Draft&lt;button&gt;&lt;/form&gt;
+  &lt;a href="/"&gt;Cancel&lt;/a&gt;
+&lt;/form&gt;
+</pre>
+
+<p>
+This gets the functionality working, but its meaning is much less clear to the HTML reader (both developers and assistive technologies).
+The "Delete Draft" button has to be modeled as a nested form, even though it's not.
+The "Cancel" button is now a link, which will have to be styled to look like a button, or else it will look very out of place.<f-note>Styling links as buttons is also a somewhat controversial practice.</f-note>
+
+<p>
+This limitation is endogenous to HTML, not the web platform itself: developers often eschew HTML functionality entirely by describing the UI with buttons and adding the appropriate functionality with scripting.
+Button actions remove this limitation, allowing HTML to model these form actions both semantically and functionally.
+
+</section>
+
+<section>
+<h2>Technical Specification</h2>
+
+Button actions are a seamless extension of the existing ways to make HTTP requests from HTML.
+They mimic the semantics of form submission, but with no data.
+
+<h3>Enabling Button Actions</h3>
+<p>
+To make a request with a button, the <code>action</code> attribute must be specified with a valid URL.
+The <code>method</code> attribute defaults to GET if not specified;
+it can also be set to all supported HTTP form methods.<f-note>
+At the time of this writing, only GET and POST are supported.
+With the adoption of Triptych #1, PUT, PATCH, and DELETE would also be supported.
+In the future, this attribute could include arbitrary custom methods as well.
+</f-note>
+
+<p>
+Buttons can issue requests if they are <code>type=submit</code>, the default button type.
+This is done to both simplify the interface, and align with author expectations that a button with <code>type=submit</code> (or no type specified) is capable of making requests.<f-note>
+This document uses the term "author" in the same way that the <a href="https://www.w3.org/TR/html-design-principles/">HTML Design Principles</a> do, to mean the person writing the HTML.
+
+<p>
+Buttons that have any other <code>type</code> attribute should ignore the <code>method</code> and <code>action</code> attributes.
+
+<h3>Interaction with forms</h3>
+
+<p>
+Buttons with the <code>action</code> attribute that are children of a form will not submit any of the form data when clicked.
+
+<p>
+If the <code>method</code> attribute is specified but no <code>action</code> attribute is, then the <code>method</code> attribute is ignored;
+the existing <a href="https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#attr-fs-formmethod"><code>formmethod</code> attribute</a> should be used to alter the method of the form.
+
+</section>
+
+<!-- <section> -->
+<!-- <h2>Button Semantics</h2> -->
+<!-- <h3>Difference From Forms</h3> -->
+<!-- <h3>Difference From Links</h3> -->
+<!-- </section> -->
+
+<section>
+<h2>Existing Workarounds</h2>
+
+<h3>Wrap The Button in a Form</h3>
+
+<p>
+As seen in <section-ref ref="sample-usage">Section 3</section-ref>, buttons can be made to issue independent POST requests by wrapping them in a form:
+
+<pre class=code>&lt;form action=/logout method=POST&gt;&lt;button&gt;Logout&lt;/button&gt;&lt;/form&gt;</pre>
+
+<p>
+This wrapping obscures the intended semantics: that's just a button that makes a request, not a form to fill out.
+This limitation is not shared by JavaScript, where one can listen for click events on buttons and issue HTTP requests in response;
+forms play no role in that process.
+Wrapping buttons in input-less forms is a workaround for missing functionality in HTML.
+
+<p>
+Wrapping buttons in forms also only works for POST methods.
+One might be tempted to do the same with a GET request, like so:
+
+<pre class=code>&lt;form action=/cancel method=GET&gt;&lt;button&gt;Cancel&lt;/button&gt;&lt;/form&gt;</pre>
+
+<p>
+But this results in a request to <code>/cancel?</code>, with an extraneous query parameter.
+
+<h3>Using Links Instead of Buttons</h3>
+
+<p>
+For buttons that would issue GET requests, it is possible to instead use links and style them like a button. This is very common:
+
+<pre class=code>&lt;a href=/logout class=button&gt;Logout&lt;/a&gt;</pre>
+
+As a practical matter, it is deceptively tricky to style links <em>exactly</em> like styled buttons.
+And, if you are using unstyled buttons that inherit the user's system button appearance (often the most accessible UX), then it is impossible.
+
+<p>
+Buttons and links also have different semantics, and these distinct semantics affect how browsers implement buttons and links.
+One example is the middle-click: when browsing with a mouse, you can middle-click a link and it will usually open in a new tab, but if you middle-click a form submission button, the form will get submitted in the same window.
+
+<!-- Exactly what those differences are is a subject of some debate, but there are absolutely times when authors would like to communicate a "button-like" action to their users, even though the result of that action is a page navigation with GET.<f-note> -->
+<!--   It's important to understand that submitting a POST form is <em>also</em> a page navigation, as is using a GET form to query. -->
+<!-- </f-note> -->
+
+<p>
+Recall the <section-ref ref="multi-action-pages">Multi-Action Pages</section-ref> example, where one button submits the form and another cancels it.
+
+<pre class=code>
+&lt;form action="/apply" method="POST"&gt;
+
+  &lt;!-- inputs omitted for clarity--&gt;
+
+  &lt;button&gt;Submit&lt;/button&gt;
+  &lt;button action="/" method="GET"&gt;Cancel&lt;/button&gt;
+&lt;/form&gt;
+</pre>
+
+The "submit" button is straightfowardly not a link—it submits the form.
+
+<p>
+In a multi-page website, "closing" the form without saving means navigating the user away.
+We want the semantics of a button to perform that page navigation.
+A button enforces that the close action always happens in this browsing context, while a hyperlink does not.
+
+<p>
+One way to think about this distinction is that buttons model actions which affect the current document, while hyperlinks model other documents (which the user could choose to open in the current browsing context, or a new one).
+Even though they both might result in GET requests, they represent different possibilities on the page.
+
+<p>
+Again, this proposal does not take a stand on exactly when a button is appropriate versus a hyperlink.
+It simply acknowledges that there are times when a button is the appropriate semantic, even when the desired action is a page navigation.
+Those semantic differences are mildly consequential in our existing web browsing paradigms; they may be more or less so in future ones.
+
+</section>
+
+<section>
+<h2>Alternatives</h2>
+<h3>Disallow GET requests on buttons</h3>
+
+<p>
+Some might worry that allowing buttons to make GET requests could lead to confusion about when buttons are appropriate instead of hyperlinks.
+If this were a blocker to adoption, button actions could forgo implementing <code>method=GET</code>.
+
+<p>
+We are of the opinion that the hyperlink is the single best-understood HTML metaphor, and that it is very unlikely that authors will start defaulting to buttons where hyperlinks would be appropriate.
+
+<p>
+This also creates a confusing diversion from the form semantics, where <code>method=GET</code> is the default.
+Disallowing GET would require choosing a different default, thereby creating unnecessary mental overhead in remembering which elements have which defaults for the same attribute.
+
+<h3>Allow name and value</h3>
+
+It's possible to let lone buttons submit a single datum, using the <code>name</code> and <code>value</code> attributes.<f-note>
+  htmx's <a href="https://htmx.org/attributes/hx-vals/">hx-vals</a> attribute is a more expansive take on this concept, where the values are encoded as JSON in the attribute value.
+</f-note>
+
+<pre class=code>&lt;button
+  action=/members
+  method=POST
+  name=person
+  value=Alex
+  &gt;Signup
+&lt;/button&gt;</pre>
+
+<p>
+This is a reasonable thing to add, and would fit well within the existing semantics of the button, which can have values that get submitted along with their parent form.
+
+<p>
+It is left out of the main proposal, however, in order to curtail scope.
+Most of the use-cases for this can also be accomplished with URLs and query parameters.
+
+<h3>Use a new "request" type</h3>
+
+Rather than re-use <code>type=submit</code>, a new <code>type=request</code> could be introduced.
+
+This is pure overhead.
+
+Does not protect the novice author from the possibly-unexpected submission resulting from the default button behavior.
+
+If you're adding method/action you're trying to make requests; it should just behave as expected without additional paperwork.
+
+</section>
+
+<section>
+<h2>Footnotes</h2>
+<footnote-list></footnote-list>
+</section>
