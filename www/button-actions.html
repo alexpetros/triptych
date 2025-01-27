@@ -298,6 +298,9 @@ One might be tempted to do the same with a GET request, like so:
 <p>
 But this results in a request to <code>/cancel?</code>, with an extraneous query parameter.
 
+<p>
+Note also that due to the fact that forms may not be nested in HTML, this technique cannot be used within forms.  Instead, you must add a separate form elsewhere in the HTML document (losing locality) and reference it via the <code>form</code> attribute.
+
 <h3>Using Links Instead of Buttons</h3>
 
 <p>
