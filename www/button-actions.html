@@ -192,15 +192,39 @@ For the sake of comparison, let's take a look at how you'd implement that last e
 
   &lt;button&gt;Submit&lt;/button&gt;
   &lt;button formaction="/draft/123" formmethod="PUT"&gt;Save Draft&lt;/button&gt;
-  &lt;form action="/draft/123" method="DELETE"&gt;&lt;button&gt;Delete Draft&lt;button&gt;&lt;/form&gt;
+  &lt;button formmethod="DELETE"&gt;Delete Draft&lt;button&gt;
   &lt;a href="/"&gt;Cancel&lt;/a&gt;
 &lt;/form&gt;
 </pre>
 
 <p>
-This gets the functionality working, but its meaning is much less clear to the HTML reader (both developers and assistive technologies).
-The "Delete Draft" button has to be modeled as a nested form, even though it's not.
-The "Cancel" button is now a link, which will have to be styled to look like a button, or else it will look very out of place.<f-note>Styling links as buttons is also a somewhat controversial practice.</f-note>
+Here the <code>formmethod</code> attribute has been set to <code>DELETE</code> so the browser (assuming <code>DELETE</code> is supported) will issue a <code>DELETE</code> request to <code>/apply</code>.  However, note that this request will include all of the values in the form and that, <code>DELETE</code> requests, like <code>GET</code> requests, use query parameters rather than form-encoded bodies.  This means that the URL may be excessively long and, due to lack of standardization among browsers, may have different content based on the browser used.
+
+<p>
+A second approach is to create a second form for the "Delete Draft" button.  However, by the specification form elements cannot be nested.  Therefore we would need to put the new form outside the current form and refer to it using the <code>form</code> attribute:
+
+<pre class=code>
+&lt;form action="/apply" method="POST"&gt;
+  &lt;input type="text" name="name" value="Alexander Petros"&gt;
+  &lt;input type="email" name="email" value="contact@example.com"&gt;
+  &lt;textarea name="coverletter"&gt;
+    My name is Alex and my passion is enterprise software sales.
+  &lt;/textarea&gt;
+
+  &lt;button&gt;Submit&lt;/button&gt;
+  &lt;button formaction="/draft/123" formmethod="PUT"&gt;Save Draft&lt;/button&gt;
+  &lt;button form="delete-form"&gt;Delete Draft&lt;button&gt;
+  &lt;a href="/"&gt;Cancel&lt;/a&gt;
+&lt;/form&gt;
+&lt;form id="delete-form" action="/apply" method="DELETE"&gt;&lt;/form&gt;
+</pre>
+
+<p>
+This gets the functionality working, but its meaning is much less clear to the HTML reader (both developers and assistive technologies) due to the loss of locality.
+The "Delete Draft" button has to be modeled as a separate form, even though logically it's not.
+
+<p>
+Note that in both examples, the "Cancel" button is now a link, which will have to be styled to look like a button, or else it will look very out of place.  This despite the fact that "Cancellation" is an action on the current resource, rather than a navigation to another resource.<f-note>Styling links as buttons is also a somewhat controversial practice.</f-note>
 
 <p>
 This limitation is endogenous to HTML, not the web platform itself: developers often eschew HTML functionality entirely by describing the UI with buttons and adding the appropriate functionality with scripting.
