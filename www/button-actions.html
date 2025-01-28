@@ -13,9 +13,9 @@
     Carson Gross (<a href="mailto:carson@bigsky.software">carson@bigsky.software</a>)
   </dd>
   <dt>Date Created</dt>
-  <dd>December 1, 2024
+  <dd>January 28, 2025
   <dt>Last Updated</dt>
-  <dd>December 1, 2024
+  <dd>January 28, 2025
   <dt>Issue Tracker</dt>
   <dd>Pending
   <dt>Status</dt>
@@ -66,7 +66,7 @@ The <code>method</code> attribute can be used to change the HTTP method of the r
 
 <p>
 When a button with the <code>action</code> attribute is included inside a form, <strong>it does not submit the form</strong>.
-Instead, it makes the request without submitting additional data, as if there had been no form at all.
+Instead, it makes the request without submitting additional data, exactly the same as if there had been no form at all.
 
 </section>
 
@@ -82,17 +82,18 @@ Instead, it makes the request without submitting additional data, as if there ha
 <h3 id=logout-button>Logout Button</h3>
 <p>
 One of the most common user interactions on the web is logging in or out of a website.
-Logins can be accomplished with a POST form, which (at its simplest) requires a username and password.
+A simple POST form, with username and password inputs, can model this interaction.
 
 <p>
 Logouts, however, do not submit data.
 There is currently no semantic way to represent a logout button;
 you have to wrap it in a form.
+This is one way to do it:
 
 <pre class=code>&lt;form action=/logout method=POST&gt;&lt;button&gt;Logout&lt;/button&gt;&lt;/form&gt;</pre>
 
 <p>
-With support for button actions, we can instead model this as creating or deleting a "session" resource.<f-note>Absent <a href="./form-http-methods">PUT, PATCH, and DELETE support</a>, we can instead do <code>&lt;button action=/logout method=POST&gt;Logout&lt;/button&gt;</code>, which is also fine.</f-note>
+With support for button actions, we can instead model this as a lone button creating or deleting a "session" resource.<f-note>Absent <a href="./form-http-methods">PUT, PATCH, and DELETE support</a>, we can instead do <code>&lt;button action=/logout method=POST&gt;Logout&lt;/button&gt;</code>, which is also fine.</f-note>
 
 <pre class=code>&lt;button action=/session method=DELETE&gt;Logout&lt;/button&gt;</pre>
 
@@ -178,58 +179,6 @@ We have also changed one button and added a brand new one.
 Once again, all of these buttons are, from the user's perspective, co-equal form controls.
 But only two of the buttons rely on the form data; two of them do not.
 Adding buttons that can perform requests independently not only removes the need to wrap them in forms, it also allows for simpler nesting <em>within</em> forms to achieve a complete set of form controls.
-
-<p>
-For the sake of comparison, let's take a look at how you'd implement that last example with currently-existing native HTML controls:<f-note>Although still assuming the additional HTTP methods provided by Triptych #1; absent those it's even less clear, because you have to use make both "Save Draft" and "Delete Draft" POSTS, and change the "Delete Draft" URL to <code>/draft/123</code>.</f-note>
-
-<pre class=code>
-&lt;form action="/apply" method="POST"&gt;
-  &lt;input type="text" name="name" value="Alexander Petros"&gt;
-  &lt;input type="email" name="email" value="contact@example.com"&gt;
-  &lt;textarea name="coverletter"&gt;
-    My name is Alex and my passion is enterprise software sales.
-  &lt;/textarea&gt;
-
-  &lt;button&gt;Submit&lt;/button&gt;
-  &lt;button formaction="/draft/123" formmethod="PUT"&gt;Save Draft&lt;/button&gt;
-  &lt;button formmethod="DELETE"&gt;Delete Draft&lt;button&gt;
-  &lt;a href="/"&gt;Cancel&lt;/a&gt;
-&lt;/form&gt;
-</pre>
-
-<p>
-Here the <code>formmethod</code> attribute has been set to <code>DELETE</code> so the browser (assuming <code>DELETE</code> is supported) will issue a <code>DELETE</code> request to <code>/apply</code>.  However, note that this request will include all of the values in the form and that, <code>DELETE</code> requests, like <code>GET</code> requests, use query parameters rather than form-encoded bodies.  This means that the URL may be excessively long and, due to lack of standardization among browsers, may have different content based on the browser used.
-
-<p>
-A second approach is to create a second form for the "Delete Draft" button.  However, by the specification form elements cannot be nested.  Therefore we would need to put the new form outside the current form and refer to it using the <code>form</code> attribute:
-
-<pre class=code>
-&lt;form action="/apply" method="POST"&gt;
-  &lt;input type="text" name="name" value="Alexander Petros"&gt;
-  &lt;input type="email" name="email" value="contact@example.com"&gt;
-  &lt;textarea name="coverletter"&gt;
-    My name is Alex and my passion is enterprise software sales.
-  &lt;/textarea&gt;
-
-  &lt;button&gt;Submit&lt;/button&gt;
-  &lt;button formaction="/draft/123" formmethod="PUT"&gt;Save Draft&lt;/button&gt;
-  &lt;button form="delete-form"&gt;Delete Draft&lt;button&gt;
-  &lt;a href="/"&gt;Cancel&lt;/a&gt;
-&lt;/form&gt;
-&lt;form id="delete-form" action="/apply" method="DELETE"&gt;&lt;/form&gt;
-</pre>
-
-<p>
-This gets the functionality working, but its meaning is much less clear to the HTML reader (both developers and assistive technologies) due to the loss of locality.
-The "Delete Draft" button has to be modeled as a separate form, even though logically it's not.
-
-<p>
-Note that in both examples, the "Cancel" button is now a link, which will have to be styled to look like a button, or else it will look very out of place.  This despite the fact that "Cancellation" is an action on the current resource, rather than a navigation to another resource.<f-note>Styling links as buttons is also a somewhat controversial practice.</f-note>
-
-<p>
-This limitation is endogenous to HTML, not the web platform itself: developers often eschew HTML functionality entirely by describing the UI with buttons and adding the appropriate functionality with scripting.
-Button actions remove this limitation, allowing HTML to model these form actions both semantically and functionally.
-
 </section>
 
 <section>
@@ -244,14 +193,19 @@ To make a request with a button, the <code>action</code> attribute must be speci
 The <code>method</code> attribute defaults to GET if not specified;
 it can also be set to all supported HTTP form methods.<f-note>
 At the time of this writing, only GET and POST are supported.
-With the adoption of Triptych #1, PUT, PATCH, and DELETE would also be supported.
+With the adoption of <a href="/triptych/form-http-methods">Triptych #1</a>, PUT, PATCH, and DELETE would also be supported.
 In the future, this attribute could include arbitrary custom methods as well.
 </f-note>
 
 <p>
-Buttons can issue requests if they are <code>type=submit</code>, the default button type.
+Buttons can issue requests if they are <code>type=submit</code>, the default button type.<f-note>
+<code>submit</code> is a mildly regrettable name in this context, as it is not typically used outside the context of a form (one does not really "submit" a link navigation).
+It is far more important, however, that the button actions work with the default <code>type</code>, which is and always will be <code>submit</code>, than it is to have a better name for that functionality.
+Besides, it's far from the most confusing default name in HTML.
+</f-note>
 This is done to both simplify the interface, and align with author expectations that a button with <code>type=submit</code> (or no type specified) is capable of making requests.<f-note>
 This document uses the term "author" in the same way that the <a href="https://www.w3.org/TR/html-design-principles/">HTML Design Principles</a> do, to mean the person writing the HTML.
+</f-note>
 
 <p>
 Buttons that have any other <code>type</code> attribute should ignore the <code>method</code> and <code>action</code> attributes.
@@ -279,7 +233,7 @@ the existing <a href="https://html.spec.whatwg.org/multipage/form-control-infras
 <h3>Wrap The Button in a Form</h3>
 
 <p>
-As seen in <section-ref ref="sample-usage">Section 3</section-ref>, buttons can be made to issue independent POST requests by wrapping them in a form:
+As seen in <section-ref ref="sample-usage">Section 3</section-ref>, buttons can currently be made to issue POST requests by wrapping them in a form:
 
 <pre class=code>&lt;form action=/logout method=POST&gt;&lt;button&gt;Logout&lt;/button&gt;&lt;/form&gt;</pre>
 
@@ -296,10 +250,68 @@ One might be tempted to do the same with a GET request, like so:
 <pre class=code>&lt;form action=/cancel method=GET&gt;&lt;button&gt;Cancel&lt;/button&gt;&lt;/form&gt;</pre>
 
 <p>
-But this results in a request to <code>/cancel?</code>, with an extraneous query parameter.
+But this results in a request to <code>/cancel?</code>, with an extraneous query parameter, which is incorrect.
 
 <p>
-Note also that due to the fact that forms may not be nested in HTML, this technique cannot be used within forms.  Instead, you must add a separate form elsewhere in the HTML document (losing locality) and reference it via the <code>form</code> attribute.
+Nor this technique cannot be used <em>within</em> forms, for any method.
+Consider how you might implement <section-ref ref="multi-action-pages">the Multi-Action Pages example</section-ref> with currently-existing native HTML controls:<f-note>Although still assuming <a href="/triptych/form-http-methods">PUT, PATCH, and DELETE support</a>; absent those it's even less clear, because you have to use make both "Save Draft" and "Delete Draft" POSTs, and <a href="/triptych/form-http-methods#ad-hoc-uri-semantics">change the "Delete Draft" URL</a> to something like <code>/draft/123/delete</code>.</f-note>
+
+<pre class=code>
+&lt;form action="/apply" method="POST"&gt;
+  &lt;input type="text" name="name" value="Alexander Petros"&gt;
+  &lt;input type="email" name="email" value="contact@example.com"&gt;
+  &lt;textarea name="coverletter"&gt;
+    My name is Alex and my passion is enterprise software sales.
+  &lt;/textarea&gt;
+
+  &lt;button&gt;Submit&lt;/button&gt;
+  &lt;button formaction="/draft/123" formmethod="PUT"&gt;Save Draft&lt;/button&gt;
+  &lt;button formmethod="DELETE"&gt;Delete Draft&lt;button&gt;
+  &lt;a href="/"&gt;Cancel&lt;/a&gt;
+&lt;/form&gt;
+</pre>
+
+<p>
+Here the <code>formmethod</code> attribute has been set to DELETE so the browser (assuming DELETE is supported) will issue a DELETE request to <code>/apply</code>.
+Unfortunately, this request will include all of the values in the form, which is neither expected nor desired.<f-note>
+Another drawback is that the form implementation of DELETE requests will likely use URL query parameters, like GET requests, rather than form-encoded bodies, like POST requests.
+This means that the URL may be excessively long, and contain leak data that should not have been shared at the URL level.
+</f-note>
+
+<p>
+A second approach is to create a second form for the <code>Delete Draft</code> button.
+This approach suffers from the HTML specification rule that forms cannot be nested.
+Therefore we would need to put the new form outside the current form and refer to it using the <code>form</code> attribute:
+
+<pre class=code>
+&lt;form action="/apply" method="POST"&gt;
+  &lt;input type="text" name="name" value="Alexander Petros"&gt;
+  &lt;input type="email" name="email" value="contact@example.com"&gt;
+  &lt;textarea name="coverletter"&gt;
+    My name is Alex and my passion is enterprise software sales.
+  &lt;/textarea&gt;
+
+  &lt;button&gt;Submit&lt;/button&gt;
+  &lt;button formaction="/draft/123" formmethod="PUT"&gt;Save Draft&lt;/button&gt;
+  &lt;button form="delete-form"&gt;Delete Draft&lt;button&gt;
+  &lt;a href="/"&gt;Cancel&lt;/a&gt;
+&lt;/form&gt;
+
+&lt;form id="delete-form" action="/apply" method="DELETE"&gt;&lt;/form&gt;
+</pre>
+
+<p>
+This gets the functionality working, but its meaning is much less clear to the HTML reader (both developers and assistive technologies) due to the loss of locality.<f-note>
+For more on the topic of locality, and its importance to HTML specifically, see <a href="https://htmx.org/essays/locality-of-behaviour/">"Locality of Behaviour."</a>
+</f-note>
+The "Delete Draft" button has to be modeled as a separate form, even though logically it's not.
+
+<p>
+Note that in both examples, the <code>Cancel</code> button is now a link, which will have to be styled to look like a button, or else it will look very out of place.  This despite the fact that "cancellation" is an action on the current resource, rather than a navigation to another resource (more on the implications of that in the following subsection).<f-note>Styling links as buttons is also a somewhat controversial practice.</f-note>
+
+<p>
+This limitation is endogenous to HTML, not the web platform itself: developers often eschew HTML functionality entirely by describing the UI with buttons and adding the appropriate functionality with scripting.
+Button actions remove this limitation, allowing HTML to model these form actions both semantically and functionally.
 
 <h3>Using Links Instead of Buttons</h3>
 
