@@ -81,7 +81,7 @@ function ajax(rawUrl, method, formData, target) {
     if (targetElement) {
       const template = document.createElement('template')
       template.innerHTML = responseText
-      processNode(template)
+      processNode(template.content)
 
       // @ts-ignore - all the targets are going to be Elements
       targetElement.replaceWith(template.content)
