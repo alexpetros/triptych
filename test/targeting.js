@@ -67,4 +67,20 @@ describe("Targeting and replacement", async () => {
     assertEqual(div.innerHTML, 'Success!')
     assertTruthy(style)
   })
+
+  it('replaces itself with an HTML element which in turn functions as expected', async () => {
+    fetchMock.get("/test", '<button id=response target="_this" action="/test2">Success!</div>')
+    fetchMock.get("/test2", 'plaintext')
+    const div = make(`
+      <div><button id=test action="/test" target="_this">HTML</button></div>
+    `)
+    const button = byId('test')
+    button.click()
+    await fetchMock.flush(true)
+    const response = byId('response')
+    assertEqual(response.innerHTML, 'Success!')
+    response.click();
+    await fetchMock.flush(true)
+    assertEqual(div.innerHTML, 'plaintext')
+  })
 })
