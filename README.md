@@ -1,3 +1,34 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=alexpetros&project=triptych&lang=id">Bahasa Indonesia</a>
+      </div>
+    </div>
+  </details>
+</div>
+
 # Triptych - New Attributes for HTML
 
 [Triptych](https://alexanderpetros.com/triptych) is a polyfill for three small HTML proposals:
