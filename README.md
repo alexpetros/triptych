@@ -43,7 +43,7 @@ When the form is submitted, replace `<div id=user-info>` with the result of `PUT
 ## Background and Design Goals
 
 Triptych is a standards-compatible implementation of a featureset that is both core to HTML, and has a lot of recent traction in the library ecosystem: declarative HTTP requests and partial page replacement.
-I outline the rationale for these proposals in [this talk I gave at Big Sky Dev Con 2024](https://unplannedobsolescence.com/blog/life-and-death-of-htmx/).
+I outline the rationale for these proposals in [this talk I gave at Big Sky Dev Con 2024](https://unplannedobsolescence.com/talks/life-and-death-of-htmx/).
 
 HTML has always supported declarative requests.
 The hyperlink is fundamental to the grammar of the web, and the `<a>` tag lets developers specify an HTTP request and subsequent page navigation.
